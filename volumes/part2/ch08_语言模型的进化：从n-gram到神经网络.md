@@ -99,15 +99,11 @@ $$c^* = (c + 1) \cdot \frac{N_{c+1}}{N_c}$$
 
 这一公式的推导可以通过以下方式理解：考虑所有出现 $c$ 次的n-gram，它们总共贡献了 $c \cdot N_c$ 次出现。在语料中，这些n-gram的下一次出现（即第 $c+1$ 次出现）来自出现 $c+1$ 次的n-gram群体。出现 $c+1$ 次的n-gram有 $N_{c+1}$ 个，每个恰好有 $c+1$ 次出现，因此它们总共贡献了 $(c+1) \cdot N_{c+1}$ 次出现。频率比 $(c+1) N_{c+1} / (c N_c)$ 衡量了"从 $c$ 次到 $c+1$ 次的相对增长"。当 $N_{c+1} / N_c$ 较小时，表明 $c$ 次群体处于分布的尾部，$c^* < c$，即估计被向下校正。
 
-对于零计数（$c = 0$），Good-Turing估计给出：
-
-$$P_{\text{GT}}(w \mid h) = \frac{1}{N} \quad \text{当 } c(h, w) = 0$$
-
-等等，这里 $1/N$ 并非最终形式。更准确地说，零频n-gram的总概率质量由 $N_0 / N$ 给出，其中 $N_0$ 是恰好零次的n-gram数量。Good-Turing估计将 $N_0 / N$ 均匀分配给所有零频n-gram（这是非参数方法的固有假设），因此每个零频n-gram获得 $1/N$ 的概率——但这仅在零频n-gram数量恰好为1时成立。实际上，零频n-gram的概率为：
+对于零计数（$c = 0$），Good-Turing估计将总概率质量 $q_{\text{GT}} \approx N_1/N$（出现一次的事件占总事件的比例）均匀分配给所有 $N_0$ 个零频n-gram：
 
 $$P_{\text{GT}}(w \mid h) = \frac{q_{\text{GT}}}{N_0} \quad \text{当 } c(h, w) = 0$$
 
-其中 $q_{\text{GT}}$ 是分配给所有零频n-gram的总概率质量。在实践中，$N_0$ 通常未知（因为穷举所有零频n-gram不可行），需要通过Good-Turing频率定律来估计。
+其中 $q_{\text{GT}}$ 是分配给所有零频n-gram的总概率质量，$N_0$ 是恰好零次的n-gram数量。其直观含义是：每个零频n-gram获得的概率正比于"罕见事件（仅出现一次的事件）在语料中的占比"，反比于零频n-gram的总数。在实践中，$N_0$ 通常未知（因为穷举所有零频n-gram不可行），需要通过Good-Turing频率定律来估计。
 
 更一般地，对于任意计数 $c$，概率估计为：
 
@@ -519,45 +515,35 @@ $$P(w \mid \mathbf{h}) = \prod_{j=1}^{l(w)-1} \sigma\left( 1(n(w, j), c) \cdot \
 
 层次Softmax将softmax的计算复杂度从 $O(V)$ 降低到 $O(\log V)$，对于 $V = 10^5$，约从 $10^5$ 降到17——这是一个约6000倍的加速。代价是引入额外的霍夫曼树参数，且所有输出词共享梯度传播路径。
 
-### 4.4 与矩阵分解的关系：Levy和Goldberg的证明
+### 4.4 GloVe与SGNS的矩阵分解视角对比
 
-Word2Vec（特别是Skip-gram with Negative Sampling, SGNS）与矩阵分解之间的关系是词向量理论中最深刻的成果之一。Levy和Goldberg（2014）证明了SGNS的目标函数等价于对一个特定的 shifted PMI 矩阵进行非负矩阵分解。
+前一小节（4.2）已详述SGNS如何等价于对移位PMI矩阵的非负矩阵分解。本小节将同一视角延伸至GloVe，并对比两种方法的本质差异。
 
-**点互信息。** 对于词 $w$ 和上下文词 $c$，其点互信息（Pointwise Mutual Information, PMI）定义为：
+**GloVe目标函数的矩阵分解形式。** 回顾GloVe目标函数：
 
-$$\text{PMI}(w, c) = \log \frac{P(w, c)}{P(w) P(c)} = \log \frac{P(w \mid c)}{P(w)}$$
+$$\mathcal{J} = \sum_{i, j=1}^V f(X_{ij}) \left( \mathbf{w}_i^{\top} \tilde{\mathbf{w}}_j + b_i + \tilde{b}_j - \log X_{ij} \right)^2$$
 
-PMI衡量 $w$ 和 $c$ 的共同出现频率超出独立出现期望的程度。$\text{PMI}(w, c) > 0$ 表示正相关，$\text{PMI}(w, c) < 0$ 表示负相关，$\text{PMI}(w, c) = 0$ 表示独立。在词向量语境中，PMI矩阵 $\mathbf{M} \in \mathbb{R}^{V \times V}$ 定义为 $M_{ij} = \text{PMI}(w_i, c_j)$，其每一行 $M_i$ 可以被理解为词 $w_i$ 在所有上下文词上的PMI向量。
+当 $f(x) \approx 1$（即忽略加权函数的影响），且忽略偏置项时，该目标近似为最小化：
 
-**SGNS目标与矩阵分解的等价性。** SGNS的目标函数（以词 $w$ 为中心词、上下文词 $c$ 为目标的单个样本，忽略上下文窗口大小的影响）为：
+$$\sum_{i, j} \left( \mathbf{w}_i^{\top} \tilde{\mathbf{w}}_j - \log X_{ij} \right)^2$$
 
-$$\mathcal{J}_{\text{SGNS}}(w, c) = \log \sigma(\mathbf{v}_w^{\top} \mathbf{v}_c) + K \cdot \mathbb{E}_{w_k \sim P_n} \left[ \log \sigma(-\mathbf{v}_{w_k}^{\top} \mathbf{v}_c) \right]$$
+令 $\mathbf{W} = [\mathbf{w}_1; \ldots; \mathbf{w}_V] \in \mathbb{R}^{V \times N}$ 和 $\tilde{\mathbf{W}} = [\tilde{\mathbf{w}}_1; \ldots; \tilde{\mathbf{w}}_V] \in \mathbb{R}^{V \times N}$，则目标变为：
 
-其中 $\sigma(x) = 1/(1+e^{-x})$。将其展开为sigmoid的对数形式：
+$$\| \mathbf{W} \tilde{\mathbf{W}}^{\top} - \mathbf{L} \|_F^2$$
 
-$$\mathcal{J}_{\text{SGNS}} = \log \frac{1}{1 + e^{-\mathbf{v}_w^{\top} \mathbf{v}_c}} + K \sum_{k=1}^K \log \frac{1}{1 + e^{\mathbf{v}_{w_k}^{\top} \mathbf{v}_c}}$$
+其中 $\mathbf{L}$ 是 $\log X_{ij}$ 组成的矩阵，$\| \cdot \|_F$ 是Frobenius范数。这是一个标准的矩阵分解问题：寻找秩-$N$ 矩阵 $\mathbf{W} \tilde{\mathbf{W}}^{\top}$ 来近似矩阵 $\mathbf{L}$。
 
-$$= -\log(1 + e^{-\mathbf{v}_w^{\top} \mathbf{v}_c}) - K \sum_{k=1}^K \log(1 + e^{\mathbf{v}_{w_k}^{\top} \mathbf{v}_c})$$
+**GloVe与SGNS的核心差异。** 将 $\log X_{ij}$ 展开：
 
-Levy和Goldberg的关键洞见是：SGNS的全局最优解（忽略嵌入向量大小约束）使得对于所有在语料中实际出现的 $(w, c)$ 对和噪声样本 $(w, w_k)$，有：
+$$\log X_{ij} = \log P(i, j) + \log T$$
 
-$$\mathbf{v}_w^{\top} \mathbf{v}_c = \text{PMI}(w, c) - \log K$$
+其中 $T = \sum_{i,j} X_{ij}$ 是共现矩阵的总计数。GloVe的内积近似 $\log P(j \mid i) + \text{const}$（条件概率的对数），而SGNS的内积近似 $\text{PMI}(w, c) - \log K$（移位点互信息）。具体而言：
 
-$$\mathbf{v}_{w_k}^{\top} \mathbf{c} = \text{PMI}(w_k, c) - \log K$$
+- **目标矩阵不同：** GloVe直接重构 $\log X_{ij}$（对数共现计数），SGNS重构 $\text{PMI}(w, c) - \log K$。PMI通过除以 $P(w)P(c)$ 对高频词进行了隐式折扣，而GloVe的加权函数 $f(x)$ 以显式方式对高频共现降权。
+- **对称性不同：** GloVe的 $\mathbf{w}_i^{\top} \tilde{\mathbf{w}}_j$ 对 $i$ 和 $j$ 对称，最优解满足 $\mathbf{w}_i \approx \tilde{\mathbf{w}}_i$；SGNS的 $\mathbf{W}$ 和 $\mathbf{C}_{\text{out}}$ 角色不同，导致二者位于语义空间的不同区域。
+- **训练效率不同：** GloVe直接访问全局共现矩阵，每次迭代利用全部统计信息；SGNS通过随机采样局部窗口训练，需要更多epoch才能充分遍历数据。
 
-即，内积编码了 shifted PMI。证明思路如下：对 $\mathcal{J}_{\text{SGNS}}$ 求导并令导数为零，得到最优性条件：
-
-$$\frac{\partial \mathcal{J}_{\text{SGNS}}}{\partial \mathbf{v}_w} = \sum_{c \in \mathcal{V}} \left[ \sigma(\mathbf{v}_w^{\top} \mathbf{v}_c) - \mathbb{I}[(w, c) \in \mathcal{D}] \right] \mathbf{v}_c = 0$$
-
-其中 $\mathbb{I}[(w, c) \in \mathcal{D}]$ 指示 $(w, c)$ 是否为正样本对。忽略向量大小的约束，最优解满足：
-
-$$\mathbf{v}_w^{\top} \mathbf{v}_c = \log \frac{P(w, c)}{P(w) P_n(c)} - \log K = \text{PMI}(w, c) + \log \frac{P(c)}{P_n(c)} - \log K$$
-
-当 $P_n$ 被选为 $P_n(c) \propto c(c)^{3/4}$ 时，$\log \frac{P(c)}{P_n(c)}$ 项影响相对有限，主要项为 $\text{PMI}(w, c) - \log K$（在 $P_n(c) = P(c)$ 的简化分析下精确成立）。因此，SGNS隐式地最小化以下重构误差：
-
-$$\min_{\mathbf{W}, \mathbf{C}} \sum_{w, c} \left( \mathbf{W}_w^{\top} \mathbf{C}_c - \text{PMI}(w, c) + \log K \right)^2$$
-
-其中 $\mathbf{W}$ 和 $\mathbf{C}$ 分别是中心词矩阵和上下文词矩阵。令 $\mathbf{M} = \mathbf{W} \mathbf{C}^{\top}$，其中 $M_{wc} = \text{PMI}(w, c) - \log K$，则SGNS等价于对矩阵 $\mathbf{M}$ 的矩阵分解。Levy和Goldberg由此证明：SGNS学习到的词向量矩阵 $\mathbf{W}$（或 $\mathbf{C}$）是PMI矩阵的低秩近似，秩由嵌入维度 $N$ 控制。这一发现将词向量的经验成功与成熟的矩阵分解理论联系起来，为理解词向量的内在结构提供了理论依据。
+两种方法代表了词向量学习的两个互补视角：GloVe强调"全局共现统计的结构"，SGNS强调"局部预测任务的判别能力"。
 
 ---
 
@@ -856,7 +842,7 @@ $$P = \frac{m}{|\hat{\mathbf{y}}|}, \quad R = \frac{m}{|\mathbf{y}|}$$
 
 $$F_{\text{mean}} = \frac{10 P R}{R + 9P}$$
 
-METEOR使用加权调和平均，精确率权重为9，召回率权重为1——这意味着精确率比召回率重要9倍。这一权重选择的动机是：在翻译评估中，"不遗漏信息"（召回率）比"避免多余信息"（精确率）更重要——多余的词可以通过后处理删除，但遗漏的词无法恢复。某些实现使用标准调和平均 $F_1 = \frac{2PR}{P+R}$，但METEOR原始论文明确使用 $F_{9:1}$。
+METEOR使用加权调和平均，召回率权重为9，精确率权重为1——这意味着召回率比精确率重要9倍。这一权重选择的动机是：在翻译评估中，"不遗漏信息"（召回率）比"避免多余信息"（精确率）更重要——多余的词可以通过后处理删除，但遗漏的词无法恢复。某些实现使用标准调和平均 $F_1 = \frac{2PR}{P+R}$，但METEOR原始论文明确使用 $F_{9:1}$。
 
 **碎片惩罚：词序结构的量化。** METEOR的独到之处在于显式度量词序质量。定义 $\text{chunks}$ 为候选中与参考保持相同词序的*连续匹配块*（Chunks）的数量。例如：
 
@@ -887,7 +873,7 @@ $$\text{METEOR} = (1 - \text{Penalty}) \cdot F_{\text{mean}}$$
 
 第四，METEOR的评分范围更广——BLEU的有效范围通常在0到1之间（但大多数实际BLEU值集中在0.05到0.35之间），METEOR的有效范围约为0到1，且在不同语言对上更具可比性。
 
-**局限性与计算成本。** METEOR的局限性同样明显：首先，它依赖外部语言学资源（如WordNet和Porter词干提取器），这使得它在低资源语言上的应用受限——许多语言没有成熟的WordNet等价物。其次，其运行速度慢于BLEU——METEOR需要在每个评估样本上执行词干提取、语义匹配和LCS计算，时间复杂度约为 $O(T_x \cdot T_y)$，而BLEU仅为 $O(T)$。第三，碎片惩罚中的chunks定义在匹配词不连续时产生多个chunks，这可能导致对某些合法但非常规的词序过度惩罚。第四，METEOR的 $F_{9:1}$ 权重（精确率权重9倍于召回率）在理论上偏向精确率，这与设计初衷（召回率导向）存在张力——不同的权重选择会显著改变分数排序。
+**局限性与计算成本。** METEOR的局限性同样明显：首先，它依赖外部语言学资源（如WordNet和Porter词干提取器），这使得它在低资源语言上的应用受限——许多语言没有成熟的WordNet等价物。其次，其运行速度慢于BLEU——METEOR需要在每个评估样本上执行词干提取、语义匹配和LCS计算，时间复杂度约为 $O(T_x \cdot T_y)$，而BLEU仅为 $O(T)$。第三，碎片惩罚中的chunks定义在匹配词不连续时产生多个chunks，这可能导致对某些合法但非常规的词序过度惩罚。第四，METEOR的 $F_{9:1}$ 权重（召回率权重9倍于精确率）在理论上偏向召回率，这与设计初衷（召回率导向）一致——不同的权重选择会显著改变分数排序。
 
 ---
 

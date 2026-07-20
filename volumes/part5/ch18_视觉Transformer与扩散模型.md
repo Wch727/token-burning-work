@@ -44,30 +44,6 @@ $$
 
 **多尺度Patch尺寸的理论考量：** 从信息论的角度，patch尺寸 $P$ 的选择反映了模型对局部细节和全局结构之间权衡的预设。较小的patch（如 $P=8$）保留了更多的空间细节，序列长度 $N$ 更大，自注意力计算量呈二次增长；较大的patch（如 $P=32$）丢失细节但序列更短、计算更快。ViT论文的消融实验表明，$P=16$ 在计算效率和性能之间取得了最佳平衡。值得指出的是，动态patch尺寸（Dynamic Patch Size）——即在不同层使用不同大小的patch——是后续研究（如Focal Transformer, Yang et al., 2021）探索的方向。
 
-## 6.2 Vision Transformer（ViT）：Transformer架构在视觉领域的首次突破
-
-### 6.2.1 图像块（Patch）的数学表示
-
-Vision Transformer的核心思想是将二维图像重新排列为一维的视觉词元（Visual Token）序列，然后将其输入标准的Transformer编码器进行处理。这一转化的关键在于图像块（Image Patch）的嵌入表示。
-
-设输入图像为 $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$，其中 $H$ 表示图像高度（像素行数），$W$ 表示图像宽度（像素列数），$C$ 表示通道数（对于RGB图像，$C=3$）。ViT将图像划分为大小为 $P \times P$ 的非重叠正方形块。由此，图像被分割为 $N = \frac{H}{P} \times \frac{W}{P}$ 个patch。每个patch可被重塑为一个长度为 $P^2 C$ 的向量：
-
-$$
-\mathbf{x}_p^i = \text{Reshape}(\mathbf{x}_{[i_h \cdot P : (i_h+1) \cdot P, i_w \cdot P : (w_w+1) \cdot P, :]}) \in \mathbb{R}^{P^2 C}, \quad i = 1, 2, \ldots, N
-$$
-
-其中 $i_h = \lfloor \frac{i-1}{W/P} \rfloor$ 和 $i_w = (i-1) \bmod (W/P)$ 分别表示第 $i$ 个patch在图像网格中的行和列索引。
-
-为了将这些patch向量映射到Transformer所需的隐藏维度 $D$，ViT引入了一个可学习的线性投影矩阵 $\mathbf{E} \in \mathbb{R}^{(P^2 C) \times D}$。实际上，这等价于一个卷积层，其卷积核大小为 $P \times P$，步长为 $P$，输出通道数为 $D$：
-
-$$
-\mathbf{z}_0 = [\mathbf{x}_p^1 \mathbf{E}; \mathbf{x}_p^2 \mathbf{E}; \cdots; \mathbf{x}_p^N \mathbf{E}] + \mathbf{E}_{\text{pos}} \in \mathbb{R}^{N \times D}
-$$
-
-这里 $\mathbf{z}_0 \in \mathbb{R}^{N \times D}$ 是Transformer编码器的输入序列，$\mathbf{E}_{\text{pos}} \in \mathbb{R}^{N \times D}$ 为位置编码（详见6.2.2节），分号表示序列拼接操作。
-
-从线性代数的视角审视，patch嵌入操作 $\mathbf{x}_p^i \mapsto \mathbf{x}_p^i \mathbf{E}$ 是一个仿射变换，它将原始的像素空间映射到一个语义更为丰富的隐藏空间。值得注意的是，当patch尺寸 $P=16$、隐藏维度 $D=768$ 时，对于典型的 $224 \times 224 \times 3$ 输入图像，每个patch为 $16 \times 16 \times 3 = 768$ 维，恰好与隐藏维度相同，此时 $\mathbf{E}$ 退化为一个方阵，这种对称性在计算效率上具有一定的优势。
-
 ### 6.2.2 多头自注意力的数学机制
 
 在深入讨论ViT的可行性之前，有必要对Transformer编码器中的核心计算单元——多头自注意力（Multi-Head Self-Attention, MHSA）——进行形式化描述。给定输入序列 $\mathbf{Z} \in \mathbb{R}^{N \times D}$，MHSA首先通过 $h$ 个独立的注意力头（attention head）并行计算注意力，然后将结果拼接后投影回 $D$ 维。
@@ -89,7 +65,7 @@ $$
 完整的前馈网络（FFN）子层是两个线性变换之间的非线性映射，中间由GELU（Gaussian Error Linear Unit, Hendrycks & Gimpel, 2016）激活函数分隔：
 
 $$
-\text{FFN}(\mathbf{z}) = \max(0, \mathbf{z} \mathbf{W}_1 + \mathbf{b}_1) \mathbf{W}_2 + \mathbf{b}_2
+\text{FFN}(\mathbf{z}) = \text{GELU}(\mathbf{z} \mathbf{W}_1 + \mathbf{b}_1) \mathbf{W}_2 + \mathbf{b}_2
 $$
 
 其中 $\mathbf{W}_1 \in \mathbb{R}^{D \times 4D}$，$\mathbf{W}_2 \in \mathbb{R}^{4D \times D}$ 为权重矩阵，$\mathbf{b}_1 \in \mathbb{R}^{4D}$，$\mathbf{b}_2 \in \mathbb{R}^{D}$ 为偏置向量。中间层维度扩展为 $4D$ 的设计在经验上被证明是最优的——过小的扩展比（如2）限制了模型的表达能力，过大的扩展比（如8以上）则引入了不必要的参数和计算开销。
@@ -294,7 +270,7 @@ $$
 
 ---
 
-## 5.5 掩码自编码器（MAE）：自监督视觉预训练的新范式
+## 6.5 掩码自编码器（MAE）：自监督视觉预训练的新范式
 
 ### 6.5.1 编码器-解码器架构
 
@@ -560,8 +536,6 @@ $$
 **DDPM与SDE的统一视角：** DDPM的反向过程（式6-43）可以看作是上述反向SDE的概率树（Probability ODE）版本——当对反向SDE应用Tweedie公式并选择特定的离散化方案时，得到的结果与DDPM采样公式一致。反过来，DDIM（Song et al., 2021）可以被理解为对反向SDE的确定性离散化（忽略随机项 $g(t) \, d\bar{\mathbf{w}}$），这正是DDIM实现确定性采样的数学根源。
 
 从SDE视角出发，研究者们提出了多种改进扩散模型的方法。**Variance Exploding（VE）**和**Variance Preserving（VP）**是两种经典的SDE参数化（Song et al., 2021）：VP SDE通过设计使整个扩散过程中数据的方差保持为1（仅改变其分布形状），VE SDE则让方差随时间指数增长。**edict（Editable Diffusion, Meng et al., 2021）**利用反向SDE的可逆性实现了图像编辑。**一致性模型（Consistency Model, Song et al., 2023）**直接在反向SDE的轨迹上学习一个将任意噪声级别映射到数据分布的映射，实现了单步生成。这些进展表明，SDE框架不仅是一个优美的数学等价描述，更是一个催生新方法论的活性研究前沿。
-
-### 6.6.6 DDIM：确定性采样与加速
 
 ### 6.7.1 DALL-E系列：自回归与扩散的融合
 
