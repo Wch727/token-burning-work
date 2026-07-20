@@ -860,15 +860,6 @@ $$\frac{\partial \mathcal{L}}{\partial x_{l-1}} = \frac{\partial \mathcal{L}}{\p
 **归纳偏置的比较**：RNN具有强烈的时序归纳偏置——它假设序列中的信息是按时间顺序逐步处理的。这种偏置对于自然语言等具有内在时序结构的数据是有利的。Transformer的归纳偏置更弱——它假设序列中的任意位置都可能与任何其他位置相关。这种更弱的偏置意味着Transformer需要更多的数据和参数来学习有效的表示，但也意味着它在更广泛的任务上具有适用性。
 
 #### 第1节 Transformer的理论局限性
-
-**视觉Transformer（ViT, 2020）**：Dosovitskiy et al.将Transformer直接应用于图像分类任务，将图像分割为固定大小的patch序列，证明了Transformer在计算机视觉领域的潜力。ViT在大型数据集（JFT-300M）上预训练后，在ImageNet上达到了88.36%的top-1准确率，首次在ImageNet上超越了精心设计的CNN（如EfficientNet）。ViT的成功表明，Transformer架构具有超越NLP领域的通用性——只要数据量足够大，自注意力机制可以自动学习到空间层次结构，无需人工设计的归纳偏置（如CNN的局部连接和共享权重）。
-
-**多模态大模型（2021至今）**：CLIP、DALL-E、Flamingo等工作将Transformer扩展到图像-文本的多模态学习，奠定了当前多模态AI的基础。CLIP通过对比学习在4亿个(image, text)对上预训练，展示了强大的zero-shot图像分类能力；DALL-E 2和Stable Diffusion将Transformer与扩散模型结合，实现了高质量的文本到图像生成；Flamingo则通过桥接预训练视觉Transformer和语言Transformer，实现了少样本视觉-语言推理。
-
-**大语言模型的兴起（2022至今）**：ChatGPT的发布将Transformer和大语言模型推入了公众视野。基于Transformer架构的大语言模型展现了强大的推理、创作和对话能力，引发了全球范围内对人工智能的重新审视。截至2024年，最先进的大语言模型参数规模已突破万亿级别（如Mixtral 8x22B、GPT-4），而开源社区（如LLaMA系列、Qwen系列、GLM系列）则推动了Transformer技术的民主化应用。从Seq2Seq到Attention，从Transformer到大语言模型，这条技术演进线生动地展示了基础研究如何通过十余年的积累，最终引发颠覆性的产业变革。
-
-回顾历史，"Attention Is All You Need"的发表可以被视为深度学习史上的一个转折点。在论文发表之前，深度学习在计算机视觉和语音识别领域已经取得了显著成功，但在自然语言处理领域仍然以RNN和CNN为主流。Transformer的出现彻底改变了这一格局，为此后七年中深度学习的飞速发展奠定了架构基础。
-
 #### 第2节 并行化效率的量化分析
 
 Transformer相比RNN的并行化优势可以通过具体的硬件利用率数据来量化。根据Vaswani et al. (2017)的报告和后续的基准测试，在配备NVIDIA P100 GPU（16GB显存，12GB/s内存带宽）的系统上：

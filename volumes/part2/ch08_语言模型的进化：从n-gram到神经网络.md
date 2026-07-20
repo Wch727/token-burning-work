@@ -459,7 +459,7 @@ $$\frac{\partial \mathcal{J}_{\text{NEG}}}{\partial \mathbf{v}_c} = (1 - \sigma(
 
 $$\frac{\partial \mathcal{J}_{\text{NEG}}}{\partial \mathbf{v}_w} = \sigma(-\mathbf{v}_w^{\top} \mathbf{v}_c) \cdot (-\mathbf{v}_c) + \sum_{k=1}^K \sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k}) \cdot \mathbf{v}_{w_k}$$
 
-注意梯度的不对称性：正样本将 $\mathbf{v}_c$ 向 $-\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近1时，梯度趋近于0，表示"已足够接近"；当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近0时，梯度趋近于 $-\mathbf{v}_w$，表示需要大幅靠近）；负样本将 $\mathbf{v}_{w_k}$ 向 $\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k})$ 接近1时，梯度趋近于 $\mathbf{v}_w$，表示需要大幅远离；当接近0时，梯度趋近于0，表示"已足够远离"）。
+注意梯度的不对称性：正样本将 $\mathbf{v}_c$ 向 $-\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近1时，梯度趋近于0，表示"已足够接近"；当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近0时，梯度趋近于 $\mathbf{v}_w$，表示需要大幅靠近）；负样本将 $\mathbf{v}_{w_k}$ 向 $\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k})$ 接近1时，梯度趋近于 $-\mathbf{v}_w$，表示需要大幅远离；当接近0时，梯度趋近于0，表示"已足够远离"）。
 
 这一梯度不对称性揭示了NEG的隐式几何结构：正样本对倾向于使向量靠近（拉近距离），负样本对倾向于使向量远离（推开距离）。最终，嵌入向量在语义空间中自发地组织成"相似词靠近、不相似词远离"的结构——这与Word2Vec的词向量可视化结果完全吻合。
 
