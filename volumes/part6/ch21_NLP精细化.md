@@ -111,17 +111,17 @@ $$
 **softmax注意力的分解。** 为了处理softmax的归一化分母，Performer将softmax分解为两个核函数的差：
 
 $$
-\exp\left(\frac{q_i^\top k_j}{\sqrt{d_k}}\right) = \exp\left(\frac{\|q_i\|^2 + \|k_j\|^2}{2\sqrt{d_k}}\right) \cdot \exp\left(-\frac{\|q_i - k_j\|^2}{2\sqrt{d_k}}\right)
+\exp\left(\frac{q_i^\top k_j}{d_k}\right) = \exp\left(\frac{\|q_i\|^2 + \|k_j\|^2}{2d_k}\right) \cdot \exp\left(-\frac{\|q_i - k_j\|^2}{2d_k}\right)
 $$
 
-第一项$\exp\left(\frac{\|q_i\|^2 + \|k_j\|^2}{2\sqrt{d_k}}\right)$可以分解为$\exp\left(\frac{\|q_i\|^2}{2\sqrt{d_k}}\right) \cdot \exp\left(\frac{\|k_j\|^2}{2\sqrt{d_k}}\right)$，这是两个向量的外积形式，可以直接通过特征映射计算。
+第一项$\exp\left(\frac{\|q_i\|^2 + \|k_j\|^2}{2d_k}\right)$可以分解为$\exp\left(\frac{\|q_i\|^2}{2d_k}\right) \cdot \exp\left(\frac{\|k_j\|^2}{2d_k}\right)$，这是两个向量的外积形式，可以直接通过特征映射计算。
 
-第二项$\exp\left(-\frac{\|q_i - k_j\|^2}{2\sqrt{d_k}}\right)$是高斯核$k(x, y) = \exp\left(-\frac{\|x-y\|^2}{2\sigma^2}\right)$的形式，其中$\sigma^2 = \sqrt{d_k}$。这同样可以通过RFF进行近似。
+第二项$\exp\left(-\frac{\|q_i - k_j\|^2}{2d_k}\right)$是高斯核$k(x, y) = \exp\left(-\frac{\|x-y\|^2}{2\sigma^2}\right)$的形式，其中$\sigma^2 = d_k$。这同样可以通过RFF进行近似。
 
 将两部分结合，定义：
 
 $$
-\phi_{\text{softmax}}(x) = \exp\left(\frac{\|x\|^2}{2\sqrt{d_k}}\right) \cdot \tilde{\phi}(x) \in \mathbb{R}^{2m}
+\phi_{\text{softmax}}(x) = \exp\left(\frac{\|x\|^2}{2d_k}\right) \cdot \tilde{\phi}(x) \in \mathbb{R}^{2m}
 $$
 
 则近似注意力为：

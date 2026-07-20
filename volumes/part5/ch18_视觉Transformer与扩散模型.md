@@ -76,7 +76,7 @@ Transformer架构本身不具备处理序列顺序的能力——自注意力机
 
 ViT的位置编码矩阵 $\mathbf{E}_{\text{pos}} \in \mathbb{R}^{N \times D}$ 是一个可学习的参数，与模型的其他参数一起通过反向传播进行优化。与NLP中广泛使用的正弦-余弦位置编码（Sinusoidal Positional Encoding）不同，ViT采用可学习位置编码的理由在于：视觉数据中"位置"的概念与语言中的"顺序"存在本质差异。图像中的空间关系是二维的，不存在天然的一维线性顺序；可学习的位置编码允许模型自主发现最优的空间编码方案。
 
-形式化地，Transformer编码器由 $L$ 层相同的层堆叠而成，每一层包含一个多头自注意力（Multi-Head Self-Attention, MHSA）子层和一个前馈网络（Feed-Forward Network, FFN）子层，每个子层之后都有残差连接（Residual Connection）和层归一化（Layer Normalization, LN）：
+形式化地，Transformer编码器由 $L$ 层相同的层堆叠而成，每一层包含一个多头自注意力（Multi-Head Self-Attention, MHSA）子层和一个前馈网络（Feed-Forward Network, MLP）子层，每个子层之后都有残差连接（Residual Connection）和层归一化（Layer Normalization, LN）：
 
 $$
 \begin{aligned}
@@ -537,7 +537,7 @@ $$
 
 从SDE视角出发，研究者们提出了多种改进扩散模型的方法。**Variance Exploding（VE）**和**Variance Preserving（VP）**是两种经典的SDE参数化（Song et al., 2021）：VP SDE通过设计使整个扩散过程中数据的方差保持为1（仅改变其分布形状），VE SDE则让方差随时间指数增长。**edict（Editable Diffusion, Meng et al., 2021）**利用反向SDE的可逆性实现了图像编辑。**一致性模型（Consistency Model, Song et al., 2023）**直接在反向SDE的轨迹上学习一个将任意噪声级别映射到数据分布的映射，实现了单步生成。这些进展表明，SDE框架不仅是一个优美的数学等价描述，更是一个催生新方法论的活性研究前沿。
 
-### 第1节 DALL-E系列：自回归与扩散的融合
+### 第6节 DALL-E系列：自回归与扩散的融合
 
 OpenAI的DALL-E系列系统（Ramesh et al., 2021, 2022; Betker et al., 2023）代表了文本到图像生成领域的重要里程碑。DALL-E（第1代）采用了两阶段方法：首先使用dVAE（Discrete Variational Autoencoder）将图像压缩为离散token序列，然后使用自回归Transformer（类似于GPT）在文本和图像token的联合分布上进行建模。DALL-E 2则引入了CLIP（Contrastive Language-Image Pre-training, Radford et al., 2021）作为文本和图像之间的语义桥梁，结合扩散模型实现了更高质量的生成。
 

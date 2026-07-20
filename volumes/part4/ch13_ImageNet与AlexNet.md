@@ -377,7 +377,7 @@ $$
 $$
 
 $$
-= -y_c + \hat{y}_c + \sum_{k \neq c} (-y_k) \left[0 - \hat{y}_c\right]
+= -y_c + \hat{y}_c + \sum_{k \neq c} y_k \hat{y}_c
 $$
 
 $$
