@@ -39,10 +39,10 @@ $$
 展开后：
 
 $$
-\tilde{O} = \underbrace{\text{softmax}\left(\frac{QK^\top E_k}{\sqrt{d_k}}\right)}_{n \times k} E_v^\top V^\top
+\tilde{O} = \text{softmax}\left(\frac{Q(KW_k)^\top}{\sqrt{d_k}}\right)VE_v
 $$
 
-注意这里$QK^\top \in \mathbb{R}^{n \times n}$的计算仍然需要$O(n^2d_k)$。Linformer的关键技巧是将投影矩阵$E_k$的构造方式设计为支持快速计算。具体而言，Linformer提出两种投影机制：
+这里 $W_k$ 是投影矩阵 $E_k \in \mathbb{R}^{d_k \times k}$，$W_v$ 是投影矩阵 $E_v \in \mathbb{R}^{d_v \times k}$。注意 $QK^\top \in \mathbb{R}^{n \times n}$ 的直接计算仍需要 $O(n^2d_k)$，因此 Linformer 将投影嵌入到计算图中：先计算 $\tilde{K} = KW_k \in \mathbb{R}^{n \times k}$ 和 $\tilde{V} = VE_v \in \mathbb{R}^{n \times k}$，再计算 $Q\tilde{K}^\top \in \mathbb{R}^{n \times k}$，最终将复杂度降至 $O(nkd_k)$。
 
 **方案一：核心采样（Core Sampling）。** 直接从n个键向量中随机采样k个，即$E_k$为一个从$\mathbb{R}^{d_k}$到$\mathbb{R}^k$的选择矩阵。这相当于对键向量进行下采样，时间复杂度降至$O(nkd_k)$。
 
@@ -626,11 +626,11 @@ $$
 **文本到文本范式。** mT5（Xue et al., 2020）是T5（Text-to-Text Transfer Transformer）的多语言扩展。与BERT系列的"理解-生成"双阶段范式不同，T5将所有NLP任务统一为文本到文本的生成问题——给定输入文本，生成输出文本。这一范式天然支持多语言场景，无需区分编码器和解码器架构。
 
 **模型规模系列。** mT5提供了从60M到13B参数的完整规模系列：
-- mT5-small：300M hidden dim, 8 layers, 8 heads
-- mT5-base：512M hidden dim, 12 layers, 16 heads
-- mT5-large：770M hidden dim, 24 layers, 32 heads
-- mT5-xl：1.2B hidden dim, 24 layers, 32 heads
-- mT5-xxl：11B hidden dim, 24 layers, 32 heads
+- mT5-small：约300M参数，隐藏维度512，8层，8头
+- mT5-base：约580M参数，隐藏维度1024，12层，16头
+- mT5-large：约770M参数，隐藏维度1024，24层，32头
+- mT5-xl：约1.2B参数，隐藏维度1024，24层，32头
+- mT5-xxl：约11B参数，隐藏维度1024，24层，32头
 
 所有变体共享相同的Sparse Attention模式（仅对局部窗口和全局token计算注意力），将自注意力的复杂度从$O(n^2)$降至$O(n\sqrt{n})$。
 
@@ -1011,7 +1011,7 @@ $$
 
 ### 6.7.2 MMLU：大规模多任务语言理解
 
-**设计动机与任务构建。** MMLU（Massive Multose Discipline Exam，Hendrycks et al., 2020）的目标是评测模型在 STEM、人文社科、商业、医学等57个学科上的专业知识和问题解决能力。MMLU的问题来自精心筛选的标准化考试和 textbooks：
+**设计动机与任务构建。** MMLU（Massive Multitask Language Understanding，Hendrycks et al., 2020）的目标是评测模型在 STEM、人文社科、商业、医学等57个学科上的专业知识和问题解决能力。MMLU的问题来自精心筛选的标准化考试和 textbooks：
 - **STEM：** 数学、物理、化学、计算机科学、工程等
 - **人文：** 历史、哲学、法律、艺术等
 - **社会科学：** 经济学、心理学、社会学等
