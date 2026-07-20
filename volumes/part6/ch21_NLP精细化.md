@@ -50,7 +50,7 @@ $$
 
 **多头扩展。** 对于h个注意力头，Linformer独立地为每个头构造投影矩阵。为避免每个头使用不同投影矩阵导致的表达力分散，Linformer进一步提出了"共享头投影"（head-wise shared projection）机制——所有头共享同一组$E_k$和$E_v$，从而在参数效率与表达力之间取得平衡。
 
-**复杂度分析。** 使用Linformer后，计算$\tilde{K} = KE_k$的复杂度为$O(n d_k k)$，计算$Q\tilde{K}^\top$的复杂度为$O(n^2 k)$，最终输出计算复杂度为$O(n k d_v)$。当$k \ll n$时，整体复杂度约为$O(n^2 k)$（若进一步对Q也做投影，可降至$O(nk)$）。在$n=4096, k=256, d=512$的设置下，Linformer将注意力计算加速约4-16倍，同时显存占用从$O(n^2)$降至$O(nk)$。
+**复杂度分析。** 使用Linformer后，计算$\tilde{K} = KE_k$的复杂度为$O(n d_k k)$，计算$Q\tilde{K}^\top$的复杂度为$O(n^2 k)$，最终输出计算复杂度为$O(n k d_v)$。在不投影Q的标准实现中，整体复杂度约为$O(n^2 k)$——仅对键值矩阵做低秩投影不足以将复杂度降至近线性，因为Q与$\tilde{K}$的矩阵乘法仍受$O(n^2)$项支配。若同时对Q也做投影（即$\tilde{Q} = QW_q$），则$Q\tilde{K}^\top$的计算可降至$O(nk^2)$，整体复杂度达到$O(nk)$。在$n=4096, k=256, d=512$的设置下，标准Linformer将注意力计算加速约2-4倍；当Q/K/V均做投影时，加速比可达4-16倍，显存占用从$O(n^2)$降至$O(nk)$。
 
 ### 6.1.3 Performer：随机特征核估计
 
@@ -212,7 +212,7 @@ end for
 return O
 ```
 
-**在线Softmax的数学推导。** 标准softmax的计算需要知道整个序列的最大值才能进行数值稳定的指数运算。FlashAttention使用了Koolman et al. (2019)提出的在线softmax算法，允许在不知道全局最大值的情况下增量计算softmax。
+**在线Softmax的数学推导。** 标准softmax的计算需要知道整个序列的最大值才能进行数值稳定的指数运算。FlashAttention（Dao et al., 2022）采用了增量式归一化策略（online softmax），允许在不知道全局最大值的情况下逐块计算softmax。
 
 对于任意行i，令$m_i^{(j)} = \max(m_i, s_{i1}, \ldots, s_{ij})$为前j个分数中的最大值，$l_i^{(j)} = \sum_{k=1}^j \exp(s_{ik} - m_i^{(j)})$为部分归一化常数。当处理新的块时：
 
@@ -424,7 +424,7 @@ $$
 **模型架构与训练。** Codex（Chen et al., 2021）是OpenAI在GPT-3（175B参数）基础上进行代码领域微调的产物。其架构继承了GPT-3的Transformer decoder结构，但训练数据和目标函数针对代码生成任务进行了优化。
 
 训练数据来源于公开的GitHub代码仓库，经过严格的过滤和质量控制。过滤标准包括：
-- 使用基于启发式的去重（detoxify-like filtering）移除恶意代码
+- 使用基于启发式的恶意代码检测与过滤
 - 基于文件扩展名过滤（仅保留.py、.js、.java、.c、.cpp、.go、.rs等）
 - 自动语法解析过滤：使用ANTLR或tree-sitter解析代码AST，丢弃解析失败的文件
 - 长度过滤：移除过长文件（>1MB）和过短文件（<100字节）
@@ -586,7 +586,7 @@ $$
 - 最大序列长度：512 token
 - 词汇表：119,547个WordPiece token（跨104种语言共享）
 
-**训练数据与课程学习。** mBERT使用各语言维基百科的dumps进行训练，总token数约为12.7B（12,700万）。训练采用采样策略$p(\ell) \propto n_\ell^{0.7}$，其中$n_\ell$为语言$\ell$的token数。指数0.7 < 1的设计实现了对低资源语言的过采样（oversampling），避免高资源语言完全主导训练梯度。这一采样权重可被视为一种简单的课程学习（curriculum learning）：模型先接触多样化的低资源语言样本，再逐渐过渡到高资源语言的高频模式。
+**训练数据与课程学习。** mBERT使用各语言维基百科的dumps进行训练，总token数约为12.7B（127亿）。训练采用采样策略$p(\ell) \propto n_\ell^{0.7}$，其中$n_\ell$为语言$\ell$的token数。指数0.7 < 1的设计实现了对低资源语言的过采样（oversampling），避免高资源语言完全主导训练梯度。这一采样权重可被视为一种简单的课程学习（curriculum learning）：模型先接触多样化的低资源语言样本，再逐渐过渡到高资源语言的高频模式。
 
 **跨语言迁移机制。** mBERT的跨语言能力并非显式设计（没有使用翻译对或平行语料），而是从共享词汇表和联合训练中" emergent "的。实验表明，mBERT在零样本跨语言设置下的表现令人惊讶地好——在XNLI（Conneau et al., 2018）基准上，mBERT在15种语言上的平均准确率达到66.4%，仅比单语言BERT平均低约5个百分点。
 
@@ -606,7 +606,7 @@ $$
 4. 移除下一句预测（NSP）任务，仅使用MLM目标
 5. 更大的批次（8192）和更长的训练步数
 
-**掩码语言建模的多语言变体。** XLM-R使用Causal Language Modeling（CLM）和Masked Language Modeling（MLM）的混合训练目标。MLM目标为：
+**掩码语言建模的多语言变体。** XLM-R（XLM-RoBERTa，Conneau et al., 2020）基于RoBERTa架构，仅使用Masked Language Modeling（MLM）目标。MLM目标为：
 
 $$
 \mathcal{L}_{\text{MLM}} = -\mathbb{E}_{\mathcal{D}} \left[ \sum_{x_i \in \mathcal{M}(x)} \log p_\theta(x_i | x_{\setminus \mathcal{M}}) \right]
@@ -1094,7 +1094,7 @@ $$
 
 其中$\text{sim}$为语义相似度（使用嵌入模型的余弦相似度）。低一致性分数$C(x)$暗示模型对该问题缺乏稳定的知识，高幻觉概率。Wang et al. (2022)的自一致性（self-consistency）方法利用了这一原理：在推理链层面采样多条路径，通过投票选择最高频的答案，不一致的路径被视为幻觉路径。
 
-**Faithfulness to the Context。** 在RAG场景中，还有一种特殊的幻觉类型——上下文不忠实（unfaithful to context）。模型可能生成与检索文档在事实上一致但与用户问题无关的内容，或者在整合多个文档时引入文档之间的虚假关联。设检索文档集合为$\mathcal{Z} = \{z_1, \ldots, z_k\}$，生成回答为$y$。 faithfulness 定义为：
+**Faithfulness to the Context。** 在RAG场景中，还有一种特殊的幻觉类型——上下文不忠实（unfaithful to context）。模型可能生成与检索文档在事实上一致但与用户问题无关的内容，或者在整合多个文档时引入文档之间的虚假关联。设检索文档集合为$\mathcal{Z} = \{z_1, \ldots, z_k\}$，生成回答为$y$。 faithfulness（忠实性）定义为：
 
 $$
 \text{Faithful}(y, q, \mathcal{Z}) = \mathbb{I}\left[\forall a \in y, \exists z_j \in \mathcal{Z} \text{ s.t. } a \text{ is entailed by } z_j\right]
@@ -1121,7 +1121,7 @@ $$
 
 ### 6.8.4 缓解幻觉的技术路线
 
-**检索增强作为事实性保障。** 最直接的缓解幻觉方法是将生成锚定在检索文档上。RAG框架（见6.5节）通过提供检索到的相关文本作为生成上下文，使模型有据可查。然而，即使提供了检索文档，模型仍可能生成与文档不一致的内容。提高RAG faithfulness 的方法包括：
+**检索增强作为事实性保障。** 最直接的缓解幻觉方法是将生成锚定在检索文档上。RAG框架（见6.5节）通过提供检索到的相关文本作为生成上下文，使模型有据可查。然而，即使提供了检索文档，模型仍可能生成与文档不一致的内容。提高RAG忠实性（faithfulness）的方法包括：
 - **事实性引导微调：** 在微调数据中显式标注"仅根据提供的文档回答，不要使用训练数据中的知识"
 - **引用标注：** 训练模型在生成事实性断言时附上文档来源引用，事后验证引用是否支持断言
 - **约束解码：** 在解码时限制模型只能生成检索文档中出现过的n-gram，或使用T5-style的span extraction直接提取答案片段
