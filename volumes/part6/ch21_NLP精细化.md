@@ -142,7 +142,7 @@ $$
 
 则每个输出$\tilde{O}_i$可以在$O(md_v)$时间内计算，整体复杂度为$O(nmd_v + nmd_k) = O(nmd)$。当$m \ll n$时（如m=256, n=4096），这是显著的加速。
 
-**线性注意力与核函数的关系。** Katharopoulos et al. (2020)的线性注意力可以视为Performer的特例。当使用线性核$k(x, y) = x^\top y$时，有：
+**线性注意力与核函数的关系。** Katharopoulos等人（2020）的线性注意力可以视为Performer的特例。当使用线性核$k(x, y) = x^\top y$时，有：
 
 $$
 \text{Attention}_{\text{linear}}(Q, K, V) = \frac{Q(K^\top V)}{Q(K^\top \mathbf{1})}
