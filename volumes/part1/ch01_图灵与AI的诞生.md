@@ -1164,7 +1164,7 @@ Lighthill报告（Lighthill, 1973）对AI研究持高度批评态度，特别指
 | 1965 | Robinson归结原理 | J. A. Robinson | 自动定理证明的核心算法 |
 | 1966 | ELIZA发表 | Weizenbaum | 自然语言处理的早期尝试 |
 | 1969 | 《感知机》出版 | Minsky & Papert | 单层感知机的局限性 |
-| 1969 | Newell & Simon《物理符号系统假说》 | Newell & Simon | 符号主义AI的核心信条 |
+| 1976 | Newell & Simon《物理符号系统假说》 | Newell & Simon | 符号主义AI的核心信条 |
 
 #### 1.8.5.3 Lighthill报告详解与AI的第一次冬天
 
