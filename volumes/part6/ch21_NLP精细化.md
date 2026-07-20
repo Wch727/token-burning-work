@@ -36,11 +36,6 @@ $$
 \tilde{O} = \text{softmax}\left(\frac{Q\tilde{K}^\top}{\sqrt{d_k}}\right)\tilde{V} = \text{softmax}\left(\frac{Q(KW_k)^\top}{\sqrt{d_k}}\right)VE_v
 $$
 
-展开后：
-
-$$
-\tilde{O} = \text{softmax}\left(\frac{Q(KW_k)^\top}{\sqrt{d_k}}\right)VE_v
-$$
 
 这里 $W_k$ 是投影矩阵 $E_k \in \mathbb{R}^{d_k \times k}$，$W_v$ 是投影矩阵 $E_v \in \mathbb{R}^{d_v \times k}$。注意 $QK^\top \in \mathbb{R}^{n \times n}$ 的直接计算仍需要 $O(n^2d_k)$，因此 Linformer 将投影嵌入到计算图中：先计算 $\tilde{K} = KW_k \in \mathbb{R}^{n \times k}$ 和 $\tilde{V} = VE_v \in \mathbb{R}^{n \times k}$，再计算 $Q\tilde{K}^\top \in \mathbb{R}^{n \times k}$，最终将复杂度降至 $O(nkd_k)$。
 

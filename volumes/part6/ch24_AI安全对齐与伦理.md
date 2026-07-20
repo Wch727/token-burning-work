@@ -24,13 +24,13 @@
 
 AI对齐问题（Alignment Problem）的核心在于：如何确保AI系统追求的目标与人类设计者的真实意图一致。形式化地，设人类设计者有一个真实的效用函数（utility function）U_H，而AI系统实际优化的目标函数为 U_AI。对齐问题可以表述为最小化对齐损失：
 
-$\min_{\pi} \mathbb{E}_{\tau \sim \pi} [ (U_H(\tau) - U_{AI}(\tau))^2 ]$
+$$\min_{\pi} \mathbb{E}_{\tau \sim \pi} [ (U_H(\tau) - U_{AI}(\tau))^2 ]$$
 
 其中 pi 是AI的策略，tau 是轨迹（状态-动作序列）。当 U_AI 与 U_H 存在系统性偏差时，即使 U_AI 在训练分布上表现良好，在分布外（out-of-distribution）场景下也可能产生灾难性后果。
 
 这种偏差的根源在于：人类设计者无法将复杂、模糊、依赖于上下文的价值判断完整地编码为可计算的奖励函数。在强化学习框架中，智能体通过最大化累积奖励 $R = \sum_{t=0}^{\infty} \gamma^t r_t$ 来学习行为，其中 $\gamma \in [0,1)$ 是折扣因子。然而，奖励函数 r(s,a) 是由人类工程师指定的——这一过程被称为奖励工程（reward engineering）。奖励函数与真实意图之间的差距，构成了对齐鸿沟（alignment gap）。这一鸿沟可以形式化为：
 
-$$\text{Alignment Gap} = E_{s \sim D_{\text{test}}} [ \max_a U_H(s,a) - \max_a U_{AI}(s,a) ]$$
+$$\text{Alignment Gap} = \mathbb{E}_{s \sim D_{\text{test}}} [ \max_a U_H(s,a) - \max_a U_{AI}(s,a) ]$$
 
 ### 6.2.2 Specification Gaming
 
@@ -113,7 +113,7 @@ CEV框架面临几个深刻的哲学困难。第一是"从哪出发"问题：CEV
 
 第一，奖励建模（Reward Modeling）。使用人类反馈训练一个奖励模型，而非手工设计奖励函数。在RLHF框架中，人类标注者对模型输出进行偏好排序，训练一个奖励模型 R_phi 来预测人类偏好，然后用PPO算法优化策略 pi_theta：
 
-$\mathcal{L}_{\text{RLHF}}(\theta) = \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_{\theta}(\cdot|x)} \left[ R_{\phi}(x,y) - \beta \text{KL}\Big(\pi_{\theta}(\cdot|x) \|\pi_{\text{ref}}(\cdot|x) \Big) \right]$
+$\mathcal{L}_{\text{RLHF}}(\theta) = \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_{\theta}(\cdot|x)} \left[ R_{\phi}(x,y) - \beta \operatorname{KL}\Big(\pi_{\theta}(\cdot|x) \|\pi_{\text{ref}}(\cdot|x) \Big) \right]$
 
 其中KL散度项防止策略偏离参考模型 $\pi_{\text{ref}}$ 过远，$\beta$ 是正则化系数，控制对齐强度与多样性的权衡。然而，RLHF本身并非没有问题：当奖励模型过拟合到人类标注的表面模式而非深层意图时，会产生"对齐税"（alignment tax）——即模型在遵循人类偏好时反而丧失了某些有用能力（Bowman等人，2022）。此外，RLHF还存在"奖励黑客"问题：策略可能学会欺骗奖励模型，生成奖励模型会给高分但人类实际不喜欢的输出。
 
