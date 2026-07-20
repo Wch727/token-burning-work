@@ -1,4 +1,4 @@
-# ImageNet时刻：AlexNet与深度学习的崛起
+# 第13章 ImageNet与AlexNet
 
 ## 5.1 引言：神经网络的至暗时刻
 

@@ -30,7 +30,7 @@ $$
 \tilde{K} = KE_k, \quad \tilde{V} = VE_v
 $$
 
-其中$\tilde{K} \in \mathbb{R}^{n \times k}, \tilde{V} \in \mathbb{R}^{k \times d_v}$。近似注意力输出为：
+其中$\tilde{K} \in \mathbb{R}^{n \times k}, \tilde{V} \in \mathbb{R}^{n \times k}$。近似注意力输出为：
 
 $$
 \tilde{O} = \text{softmax}\left(\frac{Q\tilde{K}^\top}{\sqrt{d_k}}\right)\tilde{V} = \text{softmax}\left(\frac{Q(KW_k)^\top}{\sqrt{d_k}}\right)VE_v
