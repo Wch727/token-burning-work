@@ -709,7 +709,7 @@ $$
 
 ### 第2节 VideoMAE：视频领域的掩码自编码器
 
-VideoMAE（Tong et al., 2022; Feichtenhofer et al., 2023）将MAE的成功从静态图像扩展到了视频领域，并针对视频数据的特点进行了重要改进。与图像MAE类似，VideoMAE采用编码器-解码器架构，通过重建被掩码的tubelet来进行自监督预训练。然而，视频数据的时序冗余性使得简单的掩码策略需要重新设计。
+VideoMAE（Tong et al., 2022）将MAE的成功从静态图像扩展到了视频领域，并针对视频数据的特点进行了重要改进。与图像MAE类似，VideoMAE采用编码器-解码器架构，通过重建被掩码的tubelet来进行自监督预训练。然而，视频数据的时序冗余性使得简单的掩码策略需要重新设计。
 
 ** tubelet掩码策略：** VideoMAE的关键创新在于其精心设计的tubelet掩码策略。设输入视频 clip 为 $\mathbf{V} \in \mathbb{R}^{3 \times T \times H \times W}$，被划分为 $N = \frac{T}{t} \times \frac{H}{p} \times \frac{W}{p}$ 个tubelet（每个tubelet大小为 $t \times p \times p$）。VideoMAE采用了两种掩码策略：
 
@@ -717,7 +717,7 @@ VideoMAE（Tong et al., 2022; Feichtenhofer et al., 2023）将MAE的成功从静
 
 2. ** tubelet 连续掩码（Tubelet-wise Masking）：** 在时间维度上对tubelet进行整体掩码——即同一空间位置的所有时间帧的tubelet被一起掩码或保留。这种策略迫使模型学习跨时间的运动信息，因为时间上的变化提供了关于物体运动的宝贵线索。
 
-VideoMAE v2进一步引入了基于帧采样（frame sampling）的掩码策略，从原始视频中随机采样少量帧（如4帧或8帧），仅在这些采样的帧上进行掩码，从而提高训练效率。
+VideoMAE v2（Tong et al., 2023）进一步引入了基于帧采样（frame sampling）的掩码策略，从原始视频中随机采样少量帧（如4帧或8帧），仅在这些采样的帧上进行掩码，从而提高训练效率。
 
 **重建目标：** 与图像MAE使用像素值作为重建目标不同，VideoMAE使用HOG（Histogram of Oriented Gradients, Dalal & Triggs, 2005）特征作为重建目标。HOG特征描述了图像块的边缘方向和幅度分布，对光照变化和小的空间变形具有不变性，且计算成本远低于原始像素重建。重建损失为：
 
@@ -961,6 +961,7 @@ Sora的评估采用了上述所有指标的组合——FVD评估视频质量，t
 46. Szegedy, C., Liu, W., Jia, Y., et al. (2015). Going Deeper with Convolutions. CVPR 2015.
 47. Szegedy, C., Vanhoucke, V., Ioffe, S., et al. (2016). Rethinking the Inception Architecture for Computer Vision. CVPR 2016.
 48. Tong, Z., Song, Y., Wang, J., & Wang, L. (2022). VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video Pre-Training. NeurIPS 2022.
-49. Touvron, H., Cord, M., Douze, M., et al. (2020). Training Data-Efficient Image Transformers & Distillation through Attention. ICML 2021.
-50. Van den Oord, A., Kalchbrenner, N., Kavukcuoglu, K., et al. (2016). PixelRNN: Generating Images One Pixel at a Time. ICML 2016.
+49. Tong, Z., Song, Y., Wang, J., & Wang, L. (2023). VideoMAE v2: Scaling Video Masked Autoencoders with Dual Masking Strategy. CVPR 2023.
+50. Touvron, H., Cord, M., Douze, M., et al. (2020). Training Data-Efficient Image Transformers & Distillation through Attention. ICML 2021.
+51. Van den Oord, A., Kalchbrenner, N., Kavukcuoglu, K., et al. (2016). PixelRNN: Generating Images One Pixel at a Time. ICML 2016.
 51. Vaswani, A., Shazeer, N., Parmar, N., et al. (2017). Attention Is All You Need. NeurIPS 2017.

@@ -127,7 +127,7 @@ $$\sum_{c=0}^{\infty} P(w \mid h, c_{\text{observed}} = c) = 1$$
 
 **概率质量守恒的严格验证。** 对所有历史 $h$，Good-Turing估计的概率质量之和应该为1：
 
-$$\sum_{c=0}^{\infty} P_{\text{GT}}(c \mid h) = \sum_{c=0}^{\infty} \frac{c^*}{N} = \frac{1}{N} \sum_{c=0}^{\infty} (c+1) \frac{N_{c+1}}{N_c}$$
+$$\sum_{c=0}^{\infty} P_{\text{GT}}(c \mid h) = \sum_{c=0}^{\infty} \frac{N_c \cdot c^*}{N} = \frac{1}{N} \sum_{c=0}^{\infty} N_c \cdot (c+1) \frac{N_{c+1}}{N_c}$$
 
 注意到 $N_c$ 是恰好出现 $c$ 次的n-gram数量，因此 $\sum_{c=0}^{\infty} (c+1) N_{c+1} = \sum_{c=1}^{\infty} c \cdot N_c = N$（所有计数的总和）。于是：
 

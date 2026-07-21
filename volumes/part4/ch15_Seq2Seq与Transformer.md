@@ -363,7 +363,7 @@ Transformer采用经典的Encoder-Decoder结构，但两个组件都完全由注
 
 **编码器（Encoder）**由 $N = 6$ 个相同的层堆叠而成。每个层包含两个子层：
 1. 多头自注意力（Multi-Head Self-Attention）
-2. 位置逐例前馈网络（Position-wise Feed-Forward Network）
+2. 位置逐点前馈网络（Position-wise Feed-Forward Network）
 
 每个子层周围都使用了残差连接（residual connection）和层归一化（Layer Normalization），即"Add & Norm"结构：
 
@@ -372,7 +372,7 @@ $$\text{LayerNorm}(x + \text{Sublayer}(x))$$
 **解码器（Decoder）**同样由 $N = 6$ 个相同的层堆叠而成。每个层包含三个子层：
 1. 掩码多头自注意力（Masked Multi-Head Self-Attention）
 2. 编码器-解码器注意力（Encoder-Decoder Attention / Cross-Attention）
-3. 位置逐例前馈网络
+3. 位置逐点前馈网络
 
 与编码器相同，每个子层周围也使用了残差连接和层归一化。
 
