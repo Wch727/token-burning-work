@@ -648,7 +648,7 @@ $$\min_{\mathbf{W}, \tilde{\mathbf{W}}} \sum_{i, j} w_{ij} ( \mathbf{w}_i^{\top}
 
 ### 6.1 Encoder-Decoder架构的雏形
 
-机器翻译（Machine Translation, MT）是自然语言处理中最具挑战性的任务之一。统计机器翻译（Statistical Machine Translation, SMT）长期占据主导地位，但其 pipelines 复杂、特征工程繁琐、错误传播不可避免。神经机器翻译（Neural Machine Translation, NMT）的出现标志着一个新时代的到来。
+机器翻译（Machine Translation, MT）是自然语言处理中最具挑战性的任务之一。统计机器翻译（Statistical Machine Translation, SMT）长期占据主导地位，但其流水线复杂、特征工程繁琐、错误传播不可避免。神经机器翻译（Neural Machine Translation, NMT）的出现标志着一个新时代的到来。
 
 NMT的核心架构是Encoder-Decoder框架，其雏形可追溯到Sutskever等人（2014）和Cho等人（2014）的独立工作。该框架将翻译任务建模为一个序列到序列（Sequence-to-Sequence, Seq2Seq）的映射过程。
 
@@ -855,7 +855,7 @@ METEOR使用加权调和平均，召回率权重为9，精确率权重为1——
 
 $$\text{Penalty} = 0.5 \cdot \left( \frac{\text{chunks}}{m} \right)^3$$
 
-Chunks的最小值为1（所有匹配词形成一个连续块），此时Penalty=0.5；chunks的最大值为 $m$（每个匹配词独立成块），此时Penalty=0.5。因此，Penalty的范围是 $[0, 0.5]$。指数 $3$ 的选择使得惩罚对碎片化程度的增长呈加速趋势——当chunks从1增加到2时，惩罚从0.5增加到0.5（无变化）；当chunks接近 $m$ 时，惩罚急剧上升。
+Chunks的最小值为1（所有匹配词形成一个连续块），此时Penalty趋近于0（当匹配词数 $m$ 较大时，$0.5 \cdot (1/m)^3 \approx 0$）；chunks的最大值为 $m$（每个匹配词独立成块），此时Penalty=0.5。因此，Penalty的范围是 $[0, 0.5]$。指数 $3$ 的选择使得惩罚对碎片化程度的增长呈加速趋势——当chunks从1增加到2时，惩罚从接近0开始小幅上升；当chunks接近 $m$ 时，惩罚急剧上升至0.5。
 
 **完整公式与计算流程。** METEOR分数为：
 

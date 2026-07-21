@@ -556,16 +556,16 @@ $$
 \text{MACs} = \text{Conv1: } 96 \times 55 \times 55 \times 11 \times 11 \times 3 \approx 105M
 $$
 $$
-+ \text{Conv2: } 256 \times 27 \times 27 \times 5 \times 5 \times 48 \approx 448M
++ \text{Conv2: } 256 \times 27 \times 27 \times 5 \times 5 \times 48 \approx 224M
 $$
 $$
-+ \text{Conv3: } 384 \times 13 \times 13 \times 3 \times 3 \times 256 \approx 448M
++ \text{Conv3: } 384 \times 13 \times 13 \times 3 \times 3 \times 256 \approx 150M
 $$
 $$
-+ \text{Conv4: } 384 \times 13 \times 13 \times 3 \times 3 \times 192 \approx 434M
++ \text{Conv4: } 384 \times 13 \times 13 \times 3 \times 3 \times 192 \approx 112M
 $$
 $$
-+ \text{Conv5: } 256 \times 13 \times 13 \times 3 \times 3 \times 192 \approx 576M
++ \text{Conv5: } 256 \times 13 \times 13 \times 3 \times 3 \times 192 \approx 75M
 $$
 $$
 + \text{FC6: } 4096 \times 9216 \approx 37.7M
