@@ -37,7 +37,7 @@ $$
 
 ### 第2.3节 2011年：传统方法的巅峰
 
-在AlexNet出现之前的2011年，ILSVRC竞赛的冠军是隶属于XRCI（Xerox Research Centre India，施乐研究中心印度分部）的团队，他们使用的方法核心是**密集的SIFT特征提取**加上**Fisher向量编码**（Fisher Vector Encoding），最终使用**线性SVM**进行分类。这套方法的Top-5错误率已经降低到了25.8%左右——这在当时被认为是利用传统手工特征工程方法所能达到的极限。
+在AlexNet出现之前的2011年，ILSVRC竞赛的冠军是隶属于XRCE（Xerox Research Centre Europe，施乐研究中心欧洲分部）的团队，该团队由Florent Perronnin领导，他们使用的方法核心是**Fisher向量编码**（Fisher Vector Encoding）加上**线性SVM**分类。这套方法的Top-5错误率已经降低到了25.8%左右——这在当时被认为是利用传统手工特征工程方法所能达到的极限。
 
 传统方法的核心范式可以概括为：
 1. 使用SIFT、HOG等手工设计的特征提取器提取局部图像特征。
