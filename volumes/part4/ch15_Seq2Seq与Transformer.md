@@ -1,4 +1,4 @@
-# Seq2Seq革命：注意力机制与Transformer
+# 第15章 Seq2Seq革命：注意力机制与Transformer
 
 ## 0. 注意力机制的史前史（1990-2014）
 

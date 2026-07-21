@@ -1,4 +1,4 @@
-# CNN架构的黄金时代：VGG、GoogLeNet、ResNet
+# 第14章 CNN架构的黄金时代：VGG、GoogLeNet、ResNet
 
 ## 1. 引言：深度革命的序章
 
