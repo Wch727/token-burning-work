@@ -858,7 +858,7 @@ $$\frac{\partial \mathcal{L}}{\partial x_{l-1}} = \frac{\partial \mathcal{L}}{\p
 
 ### 第7.5节 并行化效率的量化分析
 
-Transformer相比RNN的并行化优势可以通过具体的硬件利用率数据来量化。根据Vaswani等人（2017）的报告和后续的基准测试，在配备NVIDIA P100 GPU（16GB显存，12GB/s内存带宽）的系统上：
+Transformer相比RNN的并行化优势可以通过具体的硬件利用率数据来量化。根据Vaswani等人（2017）的报告和后续的基准测试，在配备NVIDIA P100 GPU（16GB HBM2显存，峰值显存带宽约720 GB/s）的系统上：
 
 - **训练吞吐量**：在WMT'14英法翻译任务上，使用8块P100 GPU时，Transformer big模型的训练速度为每步约2,000个词元（tokens per step per second），完成整个训练（约300,000步）需要约3.5天。相比之下，同等参数量级的LSTM模型（4层，每层1024维）在相同硬件上的训练速度约为每步300个词元，慢约6-7倍。
 - **GPU利用率**：在训练长度为50的序列时，Transformer的自注意力层GPU利用率约为85%-92%，而LSTM的利用率约为15%-25%。这一巨大差异主要来自于RNN的逐时间步计算模式无法有效利用GPU的大规模并行架构。

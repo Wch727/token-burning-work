@@ -1094,13 +1094,15 @@ ELIZA（Weizenbaum, 1966）是MIT的Joseph Weizenbaum开发的早期自然语言
 
 XOR问题的几何解释：单层感知机在二维输入空间中定义了一条直线（决策边界）$w_1 x_1 + w_2 x_2 + b = 0$。XOR函数的四个输入点无法被一条直线线性分开。
 
-#### 第8.5.2节 AI的"第一次冬天"（1969–1980）
+#### 第8.5.2节 连接主义的资助寒冬与更广的“第一次AI冬天”
 
 《感知机》出版后，连接主义方向的资助与学术兴趣明显降温，神经网络研究进入“冬天”——顶级会议与项目中相关工作大幅减少。需要区分：美方 AI 资金收紧有 **Mansfield 修正案、SUR 项目失望、以及更广的制度与项目因素** 等多重原因，不宜把“DARPA 总 AI 年预算骤降至约 10 万美元”直接归因于该书出版（该数字亦缺乏可靠核对，不宜当作史实硬锚）。
 
+更准确地说，1969年《感知机》主要打击的是连接主义/神经网络一脉；整个AI领域被后人统称为“第一次AI冬天”的资助收缩，则更常以约1973–1974年（Lighthill报告、英国SRC收紧、美国项目评估与合同削减）为标志，并延续至约1980年前后专家系统回潮之前。两者相关但不宜写成同一事件、同一起始年。
+
 #### 第8.5.3节 Lighthill报告
 
-Lighthill报告（Lighthill, 1973）对AI研究持高度批评态度，特别指出了组合爆炸、脆弱性、缺乏理论基础等问题。
+Lighthill报告（Lighthill, 1973）对AI研究持高度批评态度，特别指出了组合爆炸、脆弱性、缺乏理论基础等问题。它与连接主义在1969年后的边缘化共同构成第一次AI冬天的多重成因，但报告本身针对的是更广的AI研究议程，而非仅针对感知机。
 
 ### 第8.6节 早期预言的模式与教训
 
@@ -1133,14 +1135,14 @@ Lighthill报告（Lighthill, 1973）对AI研究持高度批评态度，特别指
 | 1955 | 达特茅斯会议提案提交 | McCarthy, Minsky, Rochester, Shannon | "人工智能"术语创造 |
 | 1955 | Logic Theorist开发完成 | Newell, Shaw & Simon | 第一个AI程序 |
 | 1956 | 达特茅斯会议召开 | 10位学者 | AI作为学科的诞生 |
-| 1957 | GPS开发开始 | Newell & Simon | 通用问题求解器 |
 | 1956 | Samuel跳棋程序发布 | Arthur Samuel | 机器学习概念的创造 |
-| 1959–1963 | GPS主要公开论文发表 | Newell & Simon | 手段-目的分析 |
+| 1957 | GPS开发开始 | Newell & Simon | 通用问题求解器 |
 | 1958 | Lisp语言开发 | John McCarthy | AI的核心编程语言 |
-| 1962 | Samuel 程序战胜康涅狄格州优秀棋手 Robert Nealey | Arthur Samuel | 早期公开对局里程碑（不宜称“冠军”） |
 | 1959 | "Pandemonium"模型发表 | Oliver Selfridge | 模式识别的自下而上模型 |
-| 1960 | McCarthy《递归函数……》 | McCarthy | Lisp的理论基础 |
 | 1959 | MIT AI实验室建立 | Minsky & McCarthy | 第一个AI研究实验室 |
+| 1959–1963 | GPS主要公开论文发表 | Newell & Simon | 手段-目的分析 |
+| 1960 | McCarthy《递归函数……》 | McCarthy | Lisp的理论基础 |
+| 1962 | Samuel 程序战胜康涅狄格州优秀棋手 Robert Nealey | Arthur Samuel | 早期公开对局里程碑（不宜称“冠军”） |
 | 1965 | Robinson归结原理 | J. A. Robinson | 自动定理证明的核心算法 |
 | 1966 | ELIZA发表 | Weizenbaum | 自然语言处理的早期尝试 |
 | 1969 | 《感知机》出版 | Minsky & Papert | 单层感知机的局限性 |

@@ -61,10 +61,11 @@
 | Round 4 | 3 组终审抽检 | ~15 条（DL 时间线、Good Regulator、IBM 701 功耗、Krizhevsky 履历、ResNet 2015、GTX580 3GB、LAPGAN 2015、RoBERTa/ALBERT/C4/Codex/FAVOR+ 等） | 已修 → `ab91222` |
 | Round 5 | **6 组全量通读** 24 章（非抽检、无条数上限） | ~70+ 条 high（公式/史实/基准/归属） | 已修 → `2e0a5a0` |
 | Round 6 | **6 组全量复审** 24 章（非抽检、无条数上限） | ~79 条 high（AlexNet 口径/DBN 拓扑/公式/法规编号/交叉引用等） | 已修 → `c7079f4` |
-| Round 7 | **6 组全量复审** 24 章 | ~50+ 条 high（IBM 701、PCD、SORT/ByteTrack、CFG/VAE KL、C4/α_C、Shapley 公理等） | 已修 → `59ef12c`+本轮 |
+| Round 7 | **6 组全量复审** 24 章 | ~50+ 条 high（IBM 701、PCD、SORT/ByteTrack、CFG/VAE KL、C4/α_C、Shapley 公理等） | 已修 → `89f0e1f` |
+| Round 8 | **6 组全量复审** 24 章 | ~50 条 high（AI 冬天口径、SMO/SAMME、AlexNet 算术、FlashAttention/FIM、3DGS 排序、AI 法案罚款等）；ch17–20 返回 `[]` | 已修（本轮） |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：R5 起恢复全量通读；R7 后脚本仍 0 findings。可再开 R8 确认是否返回 `[]` 或仅剩非操作性意见。
+**停止准则**：R5 起恢复全量通读；R8 后脚本仍 0 findings，且 ch17–20 复审已返回 `[]`。可再开 R9 确认是否全局趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
