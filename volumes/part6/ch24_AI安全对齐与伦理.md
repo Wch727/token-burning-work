@@ -145,12 +145,13 @@ $$\phi_i = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|! \cdot (|N| - |S| - 1)
 
 权重的直觉来源是：对于特征 $i$，恰好包含 $|S|$ 个其他特征的联盟 $S$ 出现的概率是 $\frac{|S|! \cdot (|N| - |S| - 1)!}{|N|!}$，这来自于所有 $|N|!$ 种特征排列中，特征 $i$ 前面恰好出现 $|S|$ 个特征的排列数。
 
-Shapley值的三个核心公理。Shapley值之所以成为最优分配方案，是因为它满足三个不可妥协的公理：
+Shapley值的四个核心公理。Shapley值之所以成为最优分配方案，是因为它满足四条不可妥协的公理（仅三条不足以唯一确定）：
 1. 有效性（Efficiency）：所有特征的SHAP值之和等于模型预测与基线预测的差值，即 $\sum_{i=1}^d \phi_i = f(x) - f(\emptyset)$，其中 $f(\emptyset)$ 是空集的预测值（基线）。
 2. 对称性（Symmetry）：若特征 $i$ 和 $j$ 对所有子集 $S$ 都有 $v(S \cup \{i\}) = v(S \cup \{j\})$，则 $\phi_i = \phi_j$。
-3. 哑性（Dummy）：若特征 $i$ 对所有子集 $S$ 都有 $v(S \cup \{i\}) = v(S)$，则 $\phi_i = 0$。
+3. 哑性（Dummy/Null player）：若特征 $i$ 对所有子集 $S$ 都有 $v(S \cup \{i\}) = v(S)$，则 $\phi_i = 0$。
+4. 可加性（Additivity）：对任意两个特征函数 $v,w$，有 $\phi_i(v+w)=\phi_i(v)+\phi_i(w)$。
 
-这三个公理唯一地刻画了Shapley值（Shapley, 1953），意味着任何满足这三个性质的分配方案必然给出与Shapley值完全相同的结果。
+这四条公理共同唯一地刻画了Shapley值（Shapley, 1953），意味着任何满足这四条性质的分配方案必然给出与Shapley值完全相同的结果。
 
 在机器学习中的应用。将特征函数 $v(S)$ 替换为条件期望：
 

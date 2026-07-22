@@ -93,10 +93,10 @@ $$
 将两部分结合，定义：
 
 $$
-\phi_{\text{softmax}}(x) = \exp\left(\frac{\|\hat{x}\|^2}{2}\right) \cdot \tilde{\phi}(\hat{x}) \in \mathbb{R}^{2m}
+\phi_{\text{softmax}}(x) = \exp\left(\frac{\|\hat{x}\|^2}{2}\right) \cdot \tilde{\phi}(\hat{x}) \in \mathbb{R}^{m}
 $$
 
-（其中$\hat{x} = x / d_k^{1/4}$）
+（其中$\hat{x} = x / d_k^{1/4}$；在 FAVOR+ 的正正交随机特征设定下映射维度为 $m$，而非经典 RFF 的 $\cos/\sin$ 双倍维度 $2m$）
 则近似注意力为：
 
 $$
@@ -106,11 +106,11 @@ $$
 定义前缀和矩阵：
 
 $$
-S_K = \sum_{j=1}^n \phi_{\text{softmax}}(k_j) v_j^\top \in \mathbb{R}^{2m \times d_v}
+S_K = \sum_{j=1}^n \phi_{\text{softmax}}(k_j) v_j^\top \in \mathbb{R}^{m \times d_v}
 $$
 
 $$
-S_{K1} = \sum_{j=1}^n \phi_{\text{softmax}}(k_j) \in \mathbb{R}^{2m}
+S_{K1} = \sum_{j=1}^n \phi_{\text{softmax}}(k_j) \in \mathbb{R}^{m}
 $$
 
 则每个输出$\tilde{O}_i$可以在$O(md_v)$时间内计算，整体复杂度为$O(nmd_v + nmd_k) = O(nmd)$。当$m \ll n$时（如m=256, n=4096），这是显著的加速。
