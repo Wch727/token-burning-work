@@ -349,7 +349,7 @@ $$
 
 **计算图的可表达性。** 从理论上，深度$L$、宽度$d$的Transformer可以模拟任意$L$层深、宽度为$O(d)$的布尔电路。当$L \cdot d$超过某个阈值时，电路恰好能够表示实现链式推理所需的最小深度。这一阈值与模型的隐式推理链长度正相关。
 
-**推测解码（Speculative Decoding）与推理加速。** 在推理阶段，可以使用较小的草稿模型（draft model）生成候选token序列，然后由目标大模型并行验证。设草稿模型的接受率为$r$，目标模型的单步解码时间为$t_{\text{large}}$，草稿模型为$t_{\text{small}}$，则期望解码时间为$t_{\text{small}} + (1-r) \cdot t_{\text{large}}$。当$r$较高时，整体加速显著。
+**推测解码（Speculative Decoding）与推理加速。** 在推理阶段，较小的草稿模型（draft model）通常**串行**生成长度为 $\gamma$ 的候选 token 块，再由目标大模型**一次前向**并行验证整块。设草稿 token 被接受的概率为 $\alpha$，则期望接受长度约为 $(1-\alpha^{\gamma+1})/(1-\alpha)$ 量级（Leviathan et al. / Chen et al. 一类分析）；加速比由串行草稿成本、单次验证成本与 $\alpha,\gamma$ 共同决定。不宜写成过于简化的 $t_{\text{small}}+(1-r)t_{\text{large}}$。
 
 ---
 
