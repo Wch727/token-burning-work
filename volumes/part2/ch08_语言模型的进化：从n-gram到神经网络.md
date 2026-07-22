@@ -841,7 +841,7 @@ METEOR使用加权调和平均，召回率权重为9，精确率权重为1——
 候选: "the cat sat on the mat"
 参考: "the cat was sitting on the mat"
 
-若采用词干匹配将候选中的"sat"与参考中的"sitting"对齐，则匹配词为 "the", "cat", "sat"/"sitting", "on", "the", "mat"（$m=6$）。参考中未匹配的是"was"，而非"sitting"。由于参考在"cat"与"sitting"之间插入了"was"，相邻性在参考侧被打断，匹配在候选中形成两个chunks：$\{ \text{the cat} \}$ 与 $\{ \text{sat on the mat} \}$。若示范中不把"sat"与"sitting"计为匹配，则二者均不得计入 $m$，亦不得再声称发生了词干对齐。chunks越多，表示匹配越碎片化，词序质量越差。
+**注意：** Porter 词干提取下 $\text{sitting}\to\text{sit}$、$\text{sat}\to\text{sat}$，二者**不是**词干匹配，不能把 "sat" 与 "sitting" 算作对齐。在精确匹配（及合法词干/同义匹配）下，可对齐词为 "the", "cat", "on", "the", "mat"（$m=5$）；"sat" 与 "sitting"、"was" 均未匹配。候选中连续匹配块为 $\{ \text{the cat} \}$ 与 $\{ \text{on the mat} \}$，故 $\text{chunks}=2$。若改用确有词干对齐的例子（如 "running"/"run" → 词干均为 run），则 $m$ 与 chunks 需按实际对齐重算。chunks越多，表示匹配越碎片化，词序质量越差。
 
 碎片惩罚为：
 

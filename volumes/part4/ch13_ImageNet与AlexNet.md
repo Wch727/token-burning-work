@@ -1291,7 +1291,7 @@ AlexNet的成功彻底改变了三位主角的人生轨迹：
 
 **Alex Krizhevsky**：AlexNet 后参与 DNN Research 并被 Google 收购，在 Google 从事深度学习研究至约 2017 年离开；其后去向包括创业公司 Dessa 等，不宜写成 2017 年加入 FAIR。
 
-**Ilya Sutskever**：2015年离开多伦多大学，参与创办OpenAI并担任首席科学家。2023年11月参与OpenAI董事会关于CEO Sam Altman的解职事件，随后重新加入OpenAI，2024年5月离开OpenAI创办自己的公司Safe Superintelligence Inc.
+**Ilya Sutskever**：2015年离开多伦多大学，参与创办OpenAI并担任首席科学家。2023年11月参与OpenAI董事会关于CEO Sam Altman的解职事件；危机期间他仍留在OpenAI（作为成员/董事会相关身份），并未“离开后再重新加入”，直至2024年5月离开OpenAI创办Safe Superintelligence Inc.
 
 2018年，Hinton、LeCun和Bengio因"在深度学习领域的奠基性工作"共同获得图灵奖，这是计算机科学领域的最高荣誉。评委会特别提到了AlexNet作为"深度学习突破的关键催化剂"。
 

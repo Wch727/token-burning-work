@@ -651,9 +651,9 @@ $$M_{ij} = M^{\text{causal}}_{ij} + M^{\text{pad}}_{ij}$$
 
 **Dropout**：Transformer在三个位置应用了Dropout：1）在注意力权重矩阵经过softmax之后；2）在前馈网络的隐藏层输出之后；3）在位置嵌入与词嵌入相加之后。Dropout率统一设置为$P_{\text{drop}} = 0.1$。在推理时，所有Dropout层自动禁用，模型变为确定性函数。
 
-**标签平滑（Label Smoothing）**：在计算交叉熵损失时，真实标签$y$的one-hot向量$e_y$被替换为平滑向量$\tilde{e}_y$：
-$$\tilde{e}_y = (1 - \epsilon_{\text{ls}}) \cdot e_y + \epsilon_{\text{ls}} / (V_{\text{tgt}} - 1) \cdot \mathbf{1}$$
-其中$\epsilon_{\text{ls}} = 0.1$是平滑参数，$V_{\text{tgt}}$是目标词汇表大小。标签平滑通过将过高的置信度降低，鼓励模型产生更校准的概率分布，减少过拟合。
+**标签平滑（Label Smoothing）**：在计算交叉熵损失时，真实标签$y$的one-hot向量被替换为平滑分布（Vaswani et al. / Szegedy et al.）：
+$$y'_k = (1 - \epsilon_{\text{ls}})\,\delta_{k,y} + \frac{\epsilon_{\text{ls}}}{K}$$
+其中$\epsilon_{\text{ls}} = 0.1$是平滑参数，$K$为类别数（目标词汇表大小），均匀项$\epsilon_{\text{ls}}/K$分配到全部$K$个类别（含真实类）。注意不宜写成$\epsilon/(K-1)\cdot\mathbf{1}$再与$(1-\epsilon)e_y$相加——那会使真实类概率变成$(1-\epsilon)+\epsilon/(K-1)$，与标准定义不一致。标签平滑通过将过高的置信度降低，鼓励模型产生更校准的概率分布，减少过拟合。
 
 **学习率调度**：Transformer采用了warmup加衰减的学习率调度策略：
 $$\text{lr}(\text{step}) = d_{\text{model}}^{-0.5} \cdot \min(\text{step}^{-0.5}, \text{step} \cdot \text{warmup}^{-1.5})$$

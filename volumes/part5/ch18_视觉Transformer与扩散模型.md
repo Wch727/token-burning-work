@@ -2,7 +2,7 @@
 
 ## 第1节 引言：从卷积到注意力——计算机视觉的范式转移
 
-计算机视觉（Computer Vision, CV）自2012年AlexNet（Krizhevsky et al., 2012）引爆深度学习革命以来，卷积神经网络（Convolutional Neural Network, CNN）长期占据着该领域的主导地位。从VGG（Simonyan & Zisserman, 2014）到GoogLeNet（Szegedy et al., 2015），再到ResNet（He et al., 2016）及其后的各种变体——包括DenseNet（Huang et al., 2017）、EfficientNet（Tan & Le, 2019）和ConvNeXt（Liu et al., 2022）——CNN通过其固有的归纳偏置（inductive bias）——即局部连接性、权重共享和平移等变性——在图像分类、目标检测、语义分割等视觉任务上取得了令人瞩目的成就。ImageNet大规模视觉识别挑战赛（ILSVRC, Russakovsky et al., 2015）的top-1准确率从AlexNet的约62.5%提升到了EfficientNet-L2的90.2%以上（top-5准确率则从约84.7%提升至约98.7%），COCO目标检测的AP从约35%提升到了60%以上。这些进步部分归功于网络深度的增加（从AlexNet的8层到ResNet-152的152层再到 EfficientNet的数百层等效层），部分归功于更优的训练策略（如批量归一化、学习率调度、数据增强等）。
+计算机视觉（Computer Vision, CV）自2012年AlexNet（Krizhevsky et al., 2012）引爆深度学习革命以来，卷积神经网络（Convolutional Neural Network, CNN）长期占据着该领域的主导地位。从VGG（Simonyan & Zisserman, 2014）到GoogLeNet（Szegedy et al., 2015），再到ResNet（He et al., 2016）及其后的各种变体——包括DenseNet（Huang et al., 2017）、EfficientNet（Tan & Le, 2019）和ConvNeXt（Liu et al., 2022）——CNN通过其固有的归纳偏置（inductive bias）——即局部连接性、权重共享和平移等变性——在图像分类、目标检测、语义分割等视觉任务上取得了令人瞩目的成就。ImageNet大规模视觉识别挑战赛（ILSVRC, Russakovsky et al., 2015）的top-1准确率从AlexNet的约62.5%提升到了EfficientNet-L2（Noisy Student）的约88.4%（top-5准确率则从约84.7%提升至约98.7%），COCO目标检测的AP从约35%提升到了60%以上。这些进步部分归功于网络深度的增加（从AlexNet的8层到ResNet-152的152层再到 EfficientNet的数百层等效层），部分归功于更优的训练策略（如批量归一化、学习率调度、数据增强等）。
 
 然而，CNN的核心局限也日益凸显：感受野受限于卷积核尺寸，深层网络的感受野虽然理论上可以覆盖全局，但实际训练中难以有效建模长距离依赖关系——Dilated卷积和空洞空间金字塔池（ASPP, Chen et al., 2017）虽然扩大了感受野，但本质上是手工设计的稀疏连接模式；池化操作虽然提供了空间不变性，却也丢失了精确的位置信息——这对于需要像素级精度的语义分割和关键点检测任务尤为不利；此外，CNN的层级结构是人工设计的（如ResNet中每个bottleneck块的通道数比例、每个stage的层数），模型本身无法自主决定如何分配计算资源到不同的图像区域——Attention U-Net（Oktay et al., 2018）等尝试将注意力引入CNN，但注意力机制仅在局部区域或低分辨率特征图上运行，无法实现全局级别的灵活计算资源分配。
 
@@ -966,4 +966,4 @@ Sora的评估采用了上述所有指标的组合——FVD评估视频质量，t
 49. Tong, Z., Song, Y., Wang, J., & Wang, L. (2023). VideoMAE v2: Scaling Video Masked Autoencoders with Dual Masking Strategy. CVPR 2023.
 50. Touvron, H., Cord, M., Douze, M., et al. (2020). Training Data-Efficient Image Transformers & Distillation through Attention. ICML 2021.
 51. Van den Oord, A., Kalchbrenner, N., Kavukcuoglu, K., et al. (2016). PixelRNN: Generating Images One Pixel at a Time. ICML 2016.
-51. Vaswani, A., Shazeer, N., Parmar, N., et al. (2017). Attention Is All You Need. NeurIPS 2017.
+52. Vaswani, A., Shazeer, N., Parmar, N., et al. (2017). Attention Is All You Need. NeurIPS 2017.

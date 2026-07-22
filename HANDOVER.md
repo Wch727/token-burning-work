@@ -66,10 +66,11 @@
 | Round 9 | **6 组全量复审** 24 章 | ch01–04 返回 `[]`；其余约 30+ 条 high（DBN 顶层公式、SAMME、AlexNet FLOPs/分组参数、sFID、Toolformer/GPT-J、MATH/SWE-bench 等） | 已修 → `662b25c` |
 | Round 10 | **6 组全量复审** 24 章 | ch17–24 返回 `[]`；ch05–16 仍有约 15 条 high（Rosenblatt Award、Schapire D2、Brown 聚类、Sigmoid 区间、MI50/CDNA、Samuel 中心格、MNIST SOTA 等） | 已修 → `7558a71` |
 | Round 11 | **6 组全量复审** 24 章 | ch17–20 返回 `[]`；其余约 20 条 high（Codex/GPT-J、GLUE/SuperGLUE 分数、ShuffleNet、BERT GLUE 9 项、BERT-Large TPU、定理编号、IBM 701 产量等） | 已修 → `dff9172` |
-| Round 12 | **6 组全量复审** 24 章 | 约 33 条 high（Entscheidungsproblem、DiagonalTM、DBN VC、AlexNet 2010/2012 混用、ViT 87.12%、CFG、GAIL、StarCoder 512、Omohundro 六驱动力等） | 已修（本轮） |
+| Round 12 | **6 组全量复审** 24 章 | 约 33 条 high（Entscheidungsproblem、DiagonalTM、DBN VC、AlexNet 2010/2012 混用、ViT 87.12%、CFG、GAIL、StarCoder 512、Omohundro 六驱动力等） | 已修 → `7a3ce4d` |
+| Round 13 | **6 组全量复审** 24 章 | 约 28 条 high（Fisher 渐近、MEMM 标签偏差、LeNet-5 层数、Viola–Jones 6061、VGG-19 参数、StyleGAN FID、RoBERTa 86.4、BCQ、ToT/YOLOv7/DeepLabv3 等）；ch01 组超时无新报 | 已修（本轮） |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：R5 起恢复全量通读；R12 后脚本仍 0 findings。硬伤数量已逐轮下降；可再开 R13 确认是否趋近 `[]`。
+**停止准则**：R5 起恢复全量通读；R13 后脚本仍 0 findings。硬伤数量持续下降；可再开 R14 确认是否趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -129,11 +130,11 @@
 
 **近期相关 commit（本机）**：
 ```
-（本轮）fix: R12 full re-read — high-confidence hard errors + HANDOVER
+（本轮）fix: R13 full re-read — high-confidence hard errors + HANDOVER
+7a3ce4d fix: R12 full re-read — high-confidence hard errors + HANDOVER
 dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
 7558a71 fix: R10 full re-read — high-confidence hard errors + HANDOVER
 662b25c fix: R9 full re-read — high-confidence hard errors across 24 chapters
-0e3ca38 fix: R8 full re-read — high-confidence hard errors across 24 chapters
 ```
 
 ---
