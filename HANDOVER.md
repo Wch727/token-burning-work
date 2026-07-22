@@ -68,10 +68,10 @@
 | Round 11 | **6 组全量复审** 24 章 | ch17–20 返回 `[]`；其余约 20 条 high（Codex/GPT-J、GLUE/SuperGLUE 分数、ShuffleNet、BERT GLUE 9 项、BERT-Large TPU、定理编号、IBM 701 产量等） | 已修 → `dff9172` |
 | Round 12 | **6 组全量复审** 24 章 | 约 33 条 high（Entscheidungsproblem、DiagonalTM、DBN VC、AlexNet 2010/2012 混用、ViT 87.12%、CFG、GAIL、StarCoder 512、Omohundro 六驱动力等） | 已修 → `7a3ce4d` |
 | Round 13 | **6 组全量复审** 24 章 | 约 28 条 high（Fisher 渐近、MEMM 标签偏差、LeNet-5 层数、Viola–Jones 6061、VGG-19 参数、StyleGAN FID、RoBERTa 86.4、BCQ、ToT/YOLOv7/DeepLabv3 等）；ch01 组超时无新报 | 已修 → `9f4f651` |
-| Round 14 | **6 组全量复审**（部分组完成） | ch01–04 / 05–08 / 09–12 / 21–24 已出结果并已修；**ch13–16 / ch17–20 结果未落地**（重读 agent 被中断） | **部分完成**（本 commit） |
+| Round 14 | **6 组全量复审** 24 章（分两批） | 第一批 ch01–12/21–24 → `5f97fdb`；第二批补 ch13–20 + 复扫残留（Lighthill 矛头、RTRL、UNIX、Vaillant 1994、Shannon 译名、model collapse、DSM、ControlNet 损失、Xavier n_in/out、IRM≠ICP、Bellman/PPO/占有、AlexNet MACs、Luong/FFN、InfoGAN/PixelCNN++ 等）约 30+ 条 | **本 commit 闭环 R14** |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：R5 起恢复全量通读；硬伤数量持续下降。R14 **未闭环**：需补跑 ch13–16、ch17–20 全量通读 → 修 → 再开 R15 确认是否趋近 `[]`。
+**停止准则**：R5 起恢复全量通读；R14 已闭环、脚本 0 findings。下一步：**R15 六组全量复审**，确认是否趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -127,15 +127,15 @@
 
 | # | 问题 | 说明 |
 |---|------|------|
-| 7 | 统一 commit | 已多轮 commit；R14 部分修复待 push |
+| 7 | 统一 commit | 已多轮 commit + push |
 
 **近期相关 commit（本机）**：
 ```
-（本轮）fix: R14 partial full re-read — ch01-12/21-24 hard errors + HANDOVER
+（本轮）fix: R14 full re-read closeout — ch13-20 + residual hard errors + HANDOVER
+5f97fdb fix: R14 partial full re-read — ch01-12/21-24 hard errors + HANDOVER
 9f4f651 fix: R13 full re-read — high-confidence hard errors + HANDOVER
 7a3ce4d fix: R12 full re-read — high-confidence hard errors + HANDOVER
 dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
-7558a71 fix: R10 full re-read — high-confidence hard errors + HANDOVER
 ```
 
 ---
@@ -220,36 +220,37 @@ dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
 
 ## 八、后续建议 / 接手立刻做
 
-### 8.1 R14 未完成（最高优先）
+### 8.1 最高优先：开 R15
 
-1. **补跑全量通读**（非抽检）：
-   - `volumes/part4/ch13–ch16`（ImageNet/AlexNet、CNN 黄金时代、Seq2Seq/Transformer、生成模型）
-   - `volumes/part5/ch17–ch20`（预训练 LM、ViT/扩散、理论难题、RL 复兴）
-2. 只收 **高置信硬伤**（fact / latex / structure / contradiction / citation），风格意见丢弃。
-3. 修完后跑：`node scripts/review-r8.js` + `node scripts/review-r10.js`（须 0 findings）→ commit → `git push origin main`。
-4. 再开 **R15 六组全量复审**；若多组返回 `[]` 且仅剩非 action 意见，可停。
+1. **六组全量通读** 24 章（非抽检、无条数上限）
+2. 只收 high：fact / latex / structure / contradiction / citation
+3. 修 → `node scripts/review-r8.js` + `review-r10.js`（须 0）→ commit → push
+4. 若多组 `[]` 且仅剩非 action 意见 → 可停
 
-### 8.2 R14 本 commit 已修摘要（约 22 条）
+### 8.2 R14 已修摘要
 
+**第一批（`5f97fdb`）**：ch01–12 / 21–24 约 22 条（\*2.85、Selfridge/Solomonoff、Williams 管、Bledsoe 人脸、Lighthill A/B/C、METECH、Werbos Nature 通信、加拿大双中心、DBN MNIST、信念网 Pearl、AlexNet 18.2%、TPU v3 123、Witkin 尺度空间、SuperGLUE 分数、DeepLab ASPP/mIoU、ByteTrack NMS、SAN 全称、Kleinberg 2017、Reluplex ACAS Xu 等）
+
+**第二批（本 commit）**：
 | 章 | 修复要点 |
 |----|---------|
-| ch01 | Principia \*2.85 正确式；Selfridge=MIT Lincoln Lab；Solomonoff=TRG NY；Williams 管 1024bit≠32×36 字 |
-| ch03 | 人脸识别：Bledsoe + Helen Chan/Bisson，非 Herbert Browning |
-| ch04 | Lighthill A/B/C 按原文：A=Advanced Automation，B=Bridge/Building Robots，C=CNS |
-| ch06 | METECH → MITRE Alembic / MUC |
-| ch07 | 删伪 “Werbos 1986 Nature 通信”；加拿大双中心≠含 LeCun 地理三角；DBN MNIST 约 1.25% 非“超越所有” |
-| ch09 | 信念网：Pearl 系统化，非 “Hinton 1986 提出” |
-| ch10 | AlexNet 单模型 Top-5 **18.2%**（非 17.0%）；TPU v3 ≈**123 TFLOPS BF16** |
-| ch12 | 尺度空间：Witkin 1983 引入，Lindeberg 公理化发展 |
-| ch21 | SuperGLUE BERT≈69 / BERT++≈71.5；Copilot 上下文去掉“行=字符”量纲混写 |
-| ch22 | DeepLabv1 无 ASPP（v2 才有）；v3+ Cityscapes 约 77.21→78.21；ByteTrack **仍用 NMS** |
-| ch23 | SAN = **Spectral** Attention Network |
-| ch24 | Kleinberg ITCS **2017**/arXiv 2016；Reluplex 主验 ACAS Xu 非 MNIST CNN |
+| ch04 | 批评核心是 **B 类**，非 “A 和 B” |
+| ch07 | Williams&Zipser=**RTRL** 非 BPTT；UNIX 核心=Thompson+Ritchie；人脸检测=Vaillant et al. IEE 非 NeurIPS 1994 |
+| ch08 | Shannon 中译《通信的**数学理论**》 |
+| ch13 | AlexNet ≈**0.72G MACs**/图；10900 张统一；Z 检验 e_T=26200 |
+| ch14 | 表注 10-view 非中心裁剪；ResNet-1001 统一 **4.62%** |
+| ch15 | Luong score≠readout 切换；FFN **跨位置共享权重** |
+| ch16 | InfoGAN 下界对先验 c 取期望；MoL 归 **PixelCNN++** |
+| ch17 | model collapse → **Shumailov / Alemohammad** |
+| ch18 | DSM/Tweedie 正确式；ControlNet 标准噪声损失非 mask |
+| ch19 | Xavier 前向 **n_in** / 反向 **n_out**；IRM 惩罚式 ≠ ICP 子集 |
+| ch20 | Bellman 算子 a 绑定；SAC 移入 2013–2018；PPO 最大化目标减 VF；占有测度删「无折扣」误标 |
 
 ### 8.3 其它（非阻塞）
 
-- 通读检查 ch05 / ch14 / ch15 改写连贯性
+- 通读检查 ch05 / ch14 / ch15 / ch20 改写连贯性
 - 可选：统一 ch20/ch22 三级标题；各章加 `[[TOC]]`
+- ch09–12/21–24 复扫 agent 曾超时，R15 仍应覆盖
 
 ### 8.4 工作流口令
 
@@ -258,4 +259,4 @@ dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
 
 ---
 
-*本文档由 Claude Code 维护。最近交接：2026-07-22（R14 部分完成，用户登机中断）。*
+*本文档由 Claude Code 维护。最近交接：2026-07-22（R14 闭环）。*

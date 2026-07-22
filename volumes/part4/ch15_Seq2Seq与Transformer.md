@@ -278,15 +278,11 @@ $$\alpha_{t,i} = \frac{\exp(e_{t,i})}{\sum_{k=1}^{T_x} \exp(e_{t,k})}, \quad c_t
 
 **读取out（Readout）与生成**
 
-Luong论文的一个重要改进是显式地区分了**注意力分布**和**最终输出**。在得到上下文向量 $c_t$ 后，定义读取out向量：
+Luong论文中，**dot / general / concat** 是三种**对齐打分函数**（score function），并非三种不同的 readout 分支。得到上下文向量 $c_t$ 后，注意力隐状态统一写为
 
-$$\bar{s}_t = \begin{cases} s_t & \text{if concat} \\ [s_t; c_t] & \text{if general/dot} \end{cases}$$
+$$\tilde{h}_t = \tanh\!\big(W_c [c_t; h_t]\big)$$
 
-其中concat和general/dot分别对应两种不同的注意力使用方式。然后通过softmax生成输出：
-
-$$\log P(y_t \mid y_{<t}, \mathbf{x}) \propto \bar{s}_t^\top \bar{W}_o \mathbf{e}(y_t)$$
-
-其中 $\mathbf{e}(y_t)$ 是目标词 $y_t$ 的嵌入向量，$\bar{W}_o$ 是输出权重矩阵。
+（将上下文与解码器状态拼接后再经线性层与 $\tanh$），再据此预测输出词。不宜把 “concat / general / dot” 写成在 “仅用 $s_t$” 与 “拼接 $[s_t;c_t]$” 之间切换的 readout 规则。
 
 **输入馈送（Input-feeding）**
 
@@ -603,7 +599,7 @@ $$\text{FFN}(x) = \max(0, x\mathbf{W}_1 + b_1)\mathbf{W}_2 + b_2$$
 
 关键设计选择：
 
-1. **逐位置独立**：FFN对每个位置独立应用，不跨位置共享参数。这允许模型在不同位置使用不同的非线性变换。
+1. **逐位置应用、跨位置共享权重**：FFN 对每个位置独立计算，但**同一组参数在所有位置共享**；因而各位置使用相同的非线性变换，只是输入不同。
 2. **中间层维度**：$d_{\text{ff}} = 4 \cdot d_{\text{model}}$ 是一个经验性的选择。更大的中间层提供了更强的表示能力，但也会增加参数量和计算量。
 3. **ReLU激活**：原始Transformer使用ReLU激活函数。后续工作（如GeLU、SwiGLU）表明不同的激活函数可以进一步提升性能，但ReLU的简洁性使其成为基准选择。
 

@@ -509,13 +509,13 @@ $$
 
 其中 $\epsilon$ 为步长。当 $\epsilon \to 0$ 且 $K \to \infty$ 时，$\mathbf{x}_K$ 的分布收敛到 $p(\mathbf{x})$（依据Langevin动力学与Fokker–Planck方程的经典结果）。
 
-然而，直接估计 $\nabla_{\mathbf{x}} \log p(\mathbf{x})$ 面临一个根本困难：我们无法直接计算 $p(\mathbf{x})$（它涉及对整个数据分布的归一化常数积分）。Denoising Score Matching（Vincent, 2011）通过引入一个受控的噪声过程绕过了这一问题：对数据样本 $\mathbf{x} \sim p(\mathbf{x})$ 添加噪声得到 $\mathbf{x}' = \mathbf{x} + \boldsymbol{\epsilon}$（$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \sigma^2 \mathbf{I})$），然后估计加噪分布 $p(\mathbf{x}')$ 的得分函数。关键定理表明：
+然而，直接估计 $\nabla_{\mathbf{x}} \log p(\mathbf{x})$ 面临一个根本困难：我们无法直接计算 $p(\mathbf{x})$（它涉及对整个数据分布的归一化常数积分）。Denoising Score Matching（Vincent, 2011）通过引入一个受控的噪声过程绕过了这一问题：对数据样本 $\mathbf{x} \sim p(\mathbf{x})$ 添加噪声得到 $\mathbf{x}' = \mathbf{x} + \boldsymbol{\epsilon}$（$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \sigma^2 \mathbf{I})$），然后估计**加噪分布** $p_\sigma(\mathbf{x}')$ 的得分函数。由 Tweedie / 去噪得分匹配恒等式：
 
 $$
-\nabla_{\mathbf{x}} \log p(\mathbf{x}) = \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \sigma^2 \mathbf{I})} \left[ \nabla_{\mathbf{x}'} \log p(\mathbf{x}' | \mathbf{x}) \right]_{\mathbf{x}' = \mathbf{x} + \boldsymbol{\epsilon}}
+\nabla_{\mathbf{x}'} \log p_\sigma(\mathbf{x}') = \mathbb{E}_{\mathbf{x} \sim p(\mathbf{x} \mid \mathbf{x}')}\!\left[\nabla_{\mathbf{x}'} \log p(\mathbf{x}' \mid \mathbf{x})\right] = \mathbb{E}\!\left[\frac{\mathbf{x}-\mathbf{x}'}{\sigma^2} \,\middle|\, \mathbf{x}'\right]
 $$
 
-其中条件分布 $p(\mathbf{x}' | \mathbf{x}) = \mathcal{N}(\mathbf{x}'; \mathbf{x}, \sigma^2 \mathbf{I})$ 是已知的，其得分函数有闭式解 $\nabla_{\mathbf{x}'} \log p(\mathbf{x}' | \mathbf{x}) = -(\mathbf{x}' - \mathbf{x})/\sigma^2$。因此，学习得分函数转化为学习一个回归问题：给定含噪样本 $\mathbf{x}'$，预测其原始样本 $\mathbf{x}$。
+其中条件分布 $p(\mathbf{x}' \mid \mathbf{x}) = \mathcal{N}(\mathbf{x}'; \mathbf{x}, \sigma^2 \mathbf{I})$ 已知，其得分有闭式解 $\nabla_{\mathbf{x}'} \log p(\mathbf{x}' \mid \mathbf{x}) = -(\mathbf{x}' - \mathbf{x})/\sigma^2$。因此，学习加噪分布得分转化为回归问题：给定含噪样本 $\mathbf{x}'$，预测其对应的干净样本 $\mathbf{x}$（或等价地预测噪声）。
 
 **多尺度Score Matching与扩散过程的联系：** 在扩散模型中，前向过程 $q(\mathbf{x}_t | \mathbf{x}_0)$ 在多个噪声水平上对数据进行加噪（从 $\sigma_{\min}$ 到 $\sigma_{\max}$）。对于每个噪声水平 $t$，我们可以学习对应的得分函数 $s_\theta(\mathbf{x}_t, t) \approx \nabla_{\mathbf{x}_t} \log q(\mathbf{x}_t)$。Song等人在Score-Based Generative Modeling through Stochastic Differential Equations（Song et al., 2021）中证明：扩散过程的正向过程和反向过程都可以用SDE来描述。
 
@@ -665,7 +665,7 @@ $$
 \text{CrossAttn}_{\text{controlled}}(Q, K, V) = \text{Softmax}\left(\frac{Q K^\top}{\sqrt{d}}\right) V, \quad Q = \mathbf{F}^{\text{UNet}}, \quad [K; V] = [\mathbf{F}^{\text{Ctrl}}_K; \mathbf{F}^{\text{Ctrl}}_V]
 $$
 
-**训练策略：** ControlNet采用了一个高效的微调策略。首先，将一个小型数据集（如COCO或内部数据集，包含约数万到数十万张图像及其对应的条件标注）上的扩散模型进行端到端微调，其中只有ControlNet的参数被更新（U-Net参数冻结）。其次，使用小的batch size（如4-16）和学习率（如 $10^{-5}$）。对 Stable Diffusion 1.5 量级 UNet（约 860M），ControlNet 可训练副本通常约 **3.6×10^8** 参数量级（编码器副本+零卷积），远小于“1.5B 可训练 / 2.3B 总量”一类与 Imagen 大 UNet 混淆的数字。训练使用标准的噪声预测扩散损失（$L_{\mathrm{simple}}$ / MSE，见前文），仅在被掩码的干净图像和对应的条件图之间计算。
+**训练策略：** ControlNet采用了一个高效的微调策略。首先，将一个小型数据集（如COCO或内部数据集，包含约数万到数十万张图像及其对应的条件标注）上的扩散模型进行端到端微调，其中只有ControlNet的参数被更新（U-Net参数冻结）。其次，使用小的batch size（如4-16）和学习率（如 $10^{-5}$）。对 Stable Diffusion 1.5 量级 UNet（约 860M），ControlNet 可训练副本通常约 **3.6×10^8** 参数量级（编码器副本+零卷积），远小于“1.5B 可训练 / 2.3B 总量”一类与 Imagen 大 UNet 混淆的数字。训练使用标准的噪声预测扩散损失（$L_{\mathrm{simple}}$ / MSE，见前文），在干净图像的加噪样本与对应条件图上计算——并非 MAE 式“仅在被掩码像素上”的损失。
 
 **实验结果：** ControlNet在多种条件类型上都取得了出色的结果。在Canny边缘图上，ControlNet能够精确生成符合边缘拓扑结构的图像；在深度图上，生成的图像具有与输入深度图一致的3D空间布局；在人体姿态骨架（OpenPose, Cao et al., 2019）上，ControlNet能够生成指定姿态的人物图像，且保持身体比例和关节角度的准确性；在语义分割图上，生成的图像在物体类别和空间分布上与分割图精确对应。更重要的是，ControlNet条件与文本prompt可以协同工作——用户可以使用文本指定物体的外观（如"一只橘色的猫"），同时使用深度图指定物体的位置（如"位于画面左侧，靠近一棵树"），两者共同引导生成过程。
 
