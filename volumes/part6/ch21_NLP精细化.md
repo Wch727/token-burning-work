@@ -585,14 +585,14 @@ $$
 
 **文本到文本范式。** mT5（Xue et al., 2020）是T5（Text-to-Text Transfer Transformer）的多语言扩展。与BERT系列的"理解-生成"双阶段范式不同，T5将所有NLP任务统一为文本到文本的生成问题——给定输入文本，生成输出文本。这一范式天然支持多语言场景，无需区分编码器和解码器架构。
 
-**模型规模系列。** mT5提供了从60M到13B参数的完整规模系列：
-- mT5-small：约300M参数，隐藏维度512，8层，8头
-- mT5-base：约580M参数，隐藏维度768，12层，12头
-- mT5-large：约1.2B参数，隐藏维度1024，24层，16头
-- mT5-xl：约3.7B参数，隐藏维度2048，24层，32头
-- mT5-xxl：约13B参数，隐藏维度4096，24层，64头
+**模型规模系列。** mT5 提供从 small 到 xxl 的完整规模系列（参数量约为）：
+- mT5-small：约 300M 参数
+- mT5-base：约 580M 参数
+- mT5-large：约 1.2B 参数
+- mT5-xl：约 3.7B 参数
+- mT5-xxl：约 13B 参数
 
-所有变体共享相同的Sparse Attention模式（仅对局部窗口和全局token计算注意力），将自注意力的复杂度从$O(n^2)$降至$O(n\sqrt{n})$。
+mT5 使用与 T5 一致的标准 encoder–decoder **稠密自注意力**（并非 Sparse Attention）；复杂度仍为序列长度的二次方，规模优势来自参数与多语言语料，而非稀疏注意力降复杂度。
 
 **多语言词汇表。** mT5使用SentencePiece的Unigram模型，词汇表大小为250,100 token。相比XLM-R的250K词汇表，mT5的词汇表更加面向生成任务优化——包含更多完整词的token，减少了生成时的碎片化（fragmentation）。
 
@@ -606,7 +606,7 @@ $$
 
 ### 第4.5节 PaLM：Pathways架构与大规模多语言统一模型
 
-**Pathways架构。** PaLM（Chowdhery et al., 2022）是Google提出的 Pathways系统框架下的旗舰语言模型。Pathways的设计目标是单一模型服务多种任务和模态，通过稀疏路由（sparse routing）在不同子网络之间分配计算。PaLM的核心架构选择包括：
+**Pathways 与 PaLM。** PaLM（Chowdhery et al., 2022）是 Google 在 Pathways 系统上训练的**稠密解码器**语言模型。Pathways 主要是大规模训练/调度与系统软件栈，**不等于**模型内部的稀疏专家路由（MoE）。PaLM 本身是标准稠密 Transformer，而非稀疏路由混合专家。PaLM 的核心架构选择包括：
 
 - **模型规模：** PaLM提供了540B、62B和8B三种规模。540B版本使用 Pathways系统在6144个TPU v4芯片上训练，总计算量为约$2.5 \times 10^{24}$ FLOPs。
 - **前馈网络变体：** 使用SwiGLU激活函数而非标准ReLU或GeLU。SwiGLU定义为：
