@@ -2,7 +2,7 @@
 
 > 本文件记录项目当前状态、已完成工作、遗留问题和后续建议，供接手同学参考。
 > 生成日期：2026-07-22
-> 最近更新：2026-07-22（结构修复 + ch14 事实核验）
+> 最近更新：2026-07-22（多轮 Agent 通读审稿 + 修复闭环）
 
 ---
 
@@ -49,7 +49,18 @@
 | ch03 | LaTeX 公式和英文术语修复 | 已完成 |
 | ch04 | 小节编号格式修复 | 已完成 |
 
-**2026-07-22 全量扫描**：`node scripts/review-r8.js` 与 `node scripts/review-r10.js` 均为 **0 findings**。
+**2026-07-22 全量扫描**：`node scripts/review-r8.js` 与 `node scripts/review-r10.js` 均为 **0 findings**（多轮修复后复跑仍为 0）。
+
+### 2.3b 多轮 Agent 通读审稿闭环（2026-07-22）
+
+| 轮次 | 动作 | 结果 | 状态 |
+|------|------|------|------|
+| Round 1 | 6 组并行通读 24 章 | ~69 条高置信（事实/结构/LaTeX/矛盾） | 已修 → `b30e564` |
+| Round 2 | 3 组复审 | ~23 条残留硬伤（图灵九类/JOHNNIAC、Cover、AlexNet 裁剪、Seq2Seq 优化器、DistilBERT/Chinchilla 等） | 已修 → `0f00970` |
+| Round 3 | 3 组终审抽检 | ch09–16 与 ch17–24 共 ~10 条（ResNet-1001、词表、GT200 年、DQN Nature、mT5/PaLM、VideoMAE、Chinchilla 措辞等） | 已修 → `2e24f1b` |
+| 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
+
+**停止准则**：第 3 轮后仅剩抽检级零星问题；脚本审查无结构/格式告警。ch01–08 第 3 轮抽检若再返回条目，可继续补修。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -105,7 +116,15 @@
 
 | # | 问题 | 说明 |
 |---|------|------|
-| 7 | 统一 commit | 本轮修复应已 commit；push 视远程权限由维护者执行 |
+| 7 | 统一 commit | 已多轮 commit；本地 `main` 领先 `origin/main`（未 push） |
+
+**近期相关 commit（本机）**：
+```
+2e24f1b fix: round-3 spot-check — residual timeline and architecture facts
+0f00970 fix: round-2 re-review — remaining high-confidence factual errors
+b30e564 fix: round-1 agent review — factual, structural, latex fixes across 24 chapters
+9b812b3 fix: subsection numbering (ch05/ch15) and ch14 ImageNet facts
+```
 
 ---
 
