@@ -4,5 +4,13 @@
 .DS_Store
 Thumbs.db
 
+# Root-level ad-hoc scratch (never ship with book)
+/ch*-test.md
+/fix_*.js
+/check_*.py
+/fix_*.py
+/*_check.py
+/check2.py
+
 # Node
 node_modules/
