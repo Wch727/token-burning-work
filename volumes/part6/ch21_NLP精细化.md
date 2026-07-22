@@ -602,7 +602,7 @@ $$
 3. 过滤低质量文本（如超短句子、非自然语言文本）
 4. 按语言采样权重$p(\ell) \propto n_\ell^{0.3}$进行训练采样
 
-**泰勒序列展开与深度扩展。** mT5-xxl的11B参数使得模型在低资源语言上的表现显著提升。在XGLUE（Liang et al., 2020）基准上，mT5-xxl在9种语言的文本分类任务上平均达到80.5 F1，比XLM-R-large提升约5 F1点。mT5还展示了在零样本跨语言摘要和问答任务上的能力——这些生成任务在BERT架构下难以直接处理。
+**泰勒序列展开与深度扩展。** mT5-xxl的约13B参数使得模型在低资源语言上的表现显著提升。在XGLUE（Liang et al., 2020）基准上，mT5-xxl在9种语言的文本分类任务上平均达到80.5 F1，比XLM-R-large提升约5 F1点。mT5还展示了在零样本跨语言摘要和问答任务上的能力——这些生成任务在BERT架构下难以直接处理。
 
 ### 第4.5节 PaLM：Pathways架构与大规模多语言统一模型
 
@@ -695,7 +695,7 @@ $$
 **ColBERT的细粒度交互。** 尽管双塔架构高效，但单向量表示丢失了查询与文档之间的细粒度词级匹配信息。ColBERT（Khattab & Zaharia, 2020）通过Late Interaction保留了更丰富的交互：
 
 $$
-\text{Sim}_{\text{ColBERT}}(Q, D) = \max_{i \in Q} \max_{j \in D} (E_Q[i] \cdot E_D[j])
+\text{Sim}_{\text{ColBERT}}(Q, D) = \sum_{i \in Q} \max_{j \in D} (E_Q[i] \cdot E_D[j])
 $$
 
 其中$E_Q \in \mathbb{R}^{m \times d}$和$E_D \in \mathbb{R}^{n \times d}$分别为查询和文档的token级嵌入矩阵。MaxSim操作对查询的每个token在文档中找到最相似的token，然后求和。这等价于一个soft注意力机制，但仅在编码后的表示上计算，保持了检索效率。
