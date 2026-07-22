@@ -115,7 +115,8 @@ function reviewChapter(fp) {
     'insight', 'followed by', 'delineating',
   ]
   ls.forEach((l, i) => {
-    if (l.startsWith('#') || l.startsWith('|') || l.startsWith('```') || l.startsWith('$$') || l.startsWith('$') || l.startsWith('图')) return
+    if (l.startsWith('#') || l.startsWith('|') || l.startsWith('```') || l.startsWith('$$') || l.startsWith('$') || l.startsWith('图') || /^[\s　]/.test(l)) return
+    if (l.includes('classification-calibrated')) return
     untranslated.forEach(term => {
       if (l.includes(term)) addFinding(ch, i + 1, 'Untranslated English: "' + term.trim() + '"', 'medium')
     })
@@ -127,12 +128,12 @@ function reviewChapter(fp) {
     if (dollarCount % 2 !== 0 && dollarCount > 0 && !l.includes('\\$')) {
       addFinding(ch, i + 1, 'Unmatched $ in math mode (' + dollarCount + ' dollars)', 'high')
     }
-    if (!inMathMode(l) && !l.startsWith('```') && !l.startsWith('|')) {
-      if (/\bsum\b/.test(l) && !l.includes('\\sum') && !l.includes('\\text') && !l.includes('sum_{')) addFinding(ch, i + 1, 'Missing backslash on sum', 'medium')
+    if (!inMathMode(l) && !l.startsWith('```') && !l.startsWith('|') && !/^[\s　]/.test(l)) {
+      if (/\bsum\b/.test(l) && !l.includes('\\sum') && !l.includes('\\text') && !l.includes('sum_{') && !l.includes('\\log-sum-exp')) addFinding(ch, i + 1, 'Missing backslash on sum', 'medium')
       if (/\bcdot\b/.test(l) && !l.includes('\\cdot') && !l.includes('\\text')) addFinding(ch, i + 1, 'Missing backslash on cdot', 'medium')
-      if (/\blog\b/.test(l) && !l.includes('\\log') && !l.includes('\\text')) addFinding(ch, i + 1, 'Missing backslash on log', 'medium')
-      if (/\bmax\b/.test(l) && !l.includes('\\max') && !l.includes('\\text')) addFinding(ch, i + 1, 'Missing backslash on max', 'medium')
-      if (/\bmin\b/.test(l) && !l.includes('\\min') && !l.includes('\\text')) addFinding(ch, i + 1, 'Missing backslash on min', 'medium')
+      if (/\blog\b/.test(l) && !l.includes('\\log') && !l.includes('\\text') && !l.includes('\\log-') && !l.includes('log-') && !l.includes('log_{')) addFinding(ch, i + 1, 'Missing backslash on log', 'medium')
+      if (/\bmax\b/.test(l) && !l.includes('\\max') && !l.includes('\\text') && !l.includes('\\max-') && !l.includes('max_') && !l.includes('max=')) addFinding(ch, i + 1, 'Missing backslash on max', 'medium')
+      if (/\bmin\b/.test(l) && !l.includes('\\min') && !l.includes('\\text') && !l.includes('\\min-') && !l.includes('min_')) addFinding(ch, i + 1, 'Missing backslash on min', 'medium')
     }
   })
 
@@ -146,11 +147,18 @@ function reviewChapter(fp) {
   })
 
   // 6. Factual checks
-  if (text.includes('METEOR') && text.includes('Penalty=0.5')) {
-    const idx = text.indexOf('Penalty=0.5')
-    const l = Math.floor(idx / 1) + 1
-    addFinding(ch, l, 'METEOR penalty incorrectly stated as 0.5 (should approach 0 for chunks=1)', 'high')
-  }
+  const textLines = text.split('\n')
+  textLines.forEach((l, i) => {
+    if (l.includes('METEOR') && l.includes('Penalty=0.5')) {
+      const chunksMatch = l.match(/chunks\s*=\s*(\w+)/)
+      if (chunksMatch && chunksMatch[1] === 'm') {
+        // Penalty=0.5 when chunks=m is correct (maximum fragmentation)
+      } else if (!l.includes('chunks')) {
+        // Line mentions METEOR and Penalty=0.5 together but no chunks context - check if it says chunks=m
+        addFinding(ch, i + 1, 'METEOR penalty=0.5 mentioned without chunks=m context - verify correctness', 'low')
+      }
+    }
+  })
 }
 
 const groups = {

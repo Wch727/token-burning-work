@@ -891,7 +891,7 @@ $$
 \text{FVD} = \|\boldsymbol{\mu}_{\text{real}}^{\text{I3D}} - \boldsymbol{\mu}_{\text{gen}}^{\text{I3D}}\|^2 + \text{Tr}\left(\boldsymbol{\Sigma}_{\text{real}}^{\text{I3D}} + \boldsymbol{\Sigma}_{\text{gen}}^{\text{I3D}} - 2\sqrt{\boldsymbol{\Sigma}_{\text{real}}^{\text{I3D}} \boldsymbol{\Sigma}_{\text{gen}}^{\text{I3D}}}\right)
 $$
 
-I3D网络通过将2D Inflated 3D Conv（将2D卷积核在时间维度上膨胀）预训练在Kinetics-400上，能够提取同时编码空间外观和时间运动的特征。FVD已经被广泛采用为视频生成模型的 standard benchmark——较低的FVD表示生成视频在时空维度上都与真实视频分布更接近。
+I3D网络通过将2D Inflated 3D Conv（将2D卷积核在时间维度上膨胀）预训练在Kinetics-400上，能够提取同时编码空间外观和时间运动的特征。FVD已经被广泛采用为视频生成模型的 标准基准——较低的FVD表示生成视频在时空维度上都与真实视频分布更接近。
 
 **tFID（Temporal FID）：** 另一种方法是分别对每一帧计算FID，然后取时间上的平均值或最小值。tFID的优势在于可以直接利用成熟的图像级FID评估工具，但缺点是忽略了帧间的时间一致性和运动质量。
 
@@ -907,7 +907,7 @@ Sora的评估采用了上述所有指标的组合——FVD评估视频质量，t
 
 展望未来，以下几个方向值得重点关注。第一，**多模态大模型**正在成为新的前沿——LLaVA、GPT-4V和Gemini等系统表明，视觉理解、生成和推理可以在一个统一的框架中进行。未来的视觉系统将不再局限于单一的识别或生成任务，而是能够在理解的基础上进行创造性的视觉输出。第二，**3D和4D生成**——从NeRF到3D Gaussian Splatting，结合扩散模型，三维内容生成正处于爆发期，可能彻底改变影视制作、游戏开发和虚拟现实的内容生产方式。第三，**世界模型和物理推理**——Sora所展示的"世界模拟器"方向可能引领AI系统从模式匹配走向真正的物理理解和推理，这对于自动驾驶、机器人操作和科学模拟等应用具有深远意义。第四，**效率和可持续性**——随着模型规模持续增长（从B级到T级参数），如何降低训练和推理的计算成本、减少碳足迹，将是一个兼具技术挑战和社会责任的重要课题。第五，**安全与对齐**——随着图像和视频生成模型的能力越来越强，如何防止滥用（如深度伪造、虚假信息传播）同时保持技术的创造性价值，需要技术社区、政策制定者和公众的共同参与。第六，**评估科学**——当前自动评估指标（FID、IS、CLIP Score）与人类判断之间仍存在显著差距，发展更可靠、更全面的自动评估方法——甚至通用的"视觉图灵测试"——是确保生成模型健康发展的基础性需求。
 
-最后，值得强调的是，本章所述技术突破的大规模落地离不开开源生态系统的支撑。Hugging Face的Transformers库、Diffusers库、LAION的开源数据集、GitHub社区的无数微调脚本和教程——这些基础设施使得全球的研究者、开发者和艺术家都能够站在巨人的肩膀上继续创新。Vision Transformer、Swin Transformer、Stable Diffusion等里程碑级工作的开源发布，直接催生了数以千计的衍生研究和应用产品，充分证明了开放科学（open science）在加速技术进步中的不可替代作用。从ViT到Swin Transformer，从DDPM到Stable Diffusion，从TimeSformer到Sora——这一系列突破不仅刷新了学术benchmark的数字，更重要的是重新定义了人与机器视觉交互的可能性边界。站在2026年的节点回望，计算机视觉的新纪元已经全面开启，而它的下一篇章，正等待被书写。
+最后，值得强调的是，本章所述技术突破的大规模落地离不开开源生态系统的支撑。Hugging Face的Transformers库、Diffusers库、LAION的开源数据集、GitHub社区的无数微调脚本和教程——这些基础设施使得全球的研究者、开发者和艺术家都能够站在巨人的肩膀上继续创新。Vision Transformer、Swin Transformer、Stable Diffusion等里程碑级工作的开源发布，直接催生了数以千计的衍生研究和应用产品，充分证明了开放科学（open science）在加速技术进步中的不可替代作用。从ViT到Swin Transformer，从DDPM到Stable Diffusion，从TimeSformer到Sora——这一系列突破不仅刷新了学术基准的数字，更重要的是重新定义了人与机器视觉交互的可能性边界。站在2026年的节点回望，计算机视觉的新纪元已经全面开启，而它的下一篇章，正等待被书写。
 
 ---
 
