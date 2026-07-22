@@ -107,7 +107,7 @@ $$
 
 其中 $\mathcal{C}(\mathcal{H})$ 为假设空间 $\mathcal{H}$ 的复杂度度量，$n$ 为训练样本数。对于小样本 regime（$n$ 较小），$\mathcal{C}(\mathcal{H}_{\text{CNN}}) \ll \mathcal{C}(\mathcal{H}_{\text{ViT}})$，因此CNN的泛化误差界更紧；而对于大样本 regime（$n$ 足够大），两个界都趋于收敛到真实风险，此时表达能力更强的 $\mathcal{H}_{\text{ViT}}$ 能达到更低的训练误差和泛化误差。
 
-**大规模数据集上的突破：** 当训练数据扩展到JFT-300M（包含约3亿张图像的大规模Google私有数据集，涵盖约18K类别）时，ViT的表现发生了质变。ViT-L/16（Large模型，24层Transformer编码器，隐藏维度1024，16个注意力头，约304M参数）在 JFT 预训练后于 ImageNet-1K 上 fine-tune 约达到 87.76% 的 top-1 准确率，优于此前最优的 CNN 模型（包括使用大量数据增强和自训练的 Noisy Student 等）。ViT-H/14（Huge 模型，32 层，隐藏维度 1280，16 个注意力头，约 632M 参数）更是将准确率推高至约 88.55%，将 ImageNet top-1 准确率的纪录向前推进了一大步。
+**大规模数据集上的突破：** 当训练数据扩展到JFT-300M（包含约3亿张图像的大规模Google私有数据集，涵盖约18K类别）时，ViT的表现发生了质变。ViT-L/16（Large模型，24层Transformer编码器，隐藏维度1024，16个注意力头，约304M参数）在 JFT 预训练后于 ImageNet-1K 上 fine-tune 约达到 **87.12%** 的 top-1 准确率，优于此前最优的 CNN 模型（包括使用大量数据增强和自训练的 Noisy Student 等）。ViT-H/14（Huge 模型，32 层，隐藏维度 1280，16 个注意力头，约 632M 参数）更是将准确率推高至约 **88.55%**，将 ImageNet top-1 准确率的纪录向前推进了一大步。
 
 Dosovitskiy等人在论文中进行了系统的消融实验（ablation study），揭示了几个关键的设计选择：
 
@@ -481,14 +481,13 @@ $$
 
 其中 $\emptyset$ 表示空条件（dropout后的条件），$w \geq 1$ 为引导强度。当 $w=1$ 时，$\tilde{\boldsymbol{\epsilon}} = \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, \mathbf{c})$ 为标准条件采样。Classifer-Free Guidance的优势在于：（1）无需额外训练分类器；（2）支持任意类型的条件信号（类别标签、文本描述、深度图、分割图等）；（3）引导强度 $w$ 可以在推理时灵活调整，$w$ 越大生成图像与条件的关联性越强，但多样性会相应降低。
 
-从概率论的角度，无分类器引导可以被理解为对条件分布进行再归一化（renormalization）：
+从概率论的角度，无分类器引导可以被理解为对条件分布进行再归一化（renormalization）。由 Bayes 公式 $p(\mathbf{x}|\mathbf{c})\propto p(\mathbf{c}|\mathbf{x})\,p(\mathbf{x})$，有：
 
 $$
-p_{\text{guided}}(\mathbf{x} | \mathbf{c}) \propto \frac{p(\mathbf{x} | \mathbf{c})^w}{p(\mathbf{x})^{w-1}} = p(\mathbf{x})\cdot p(\mathbf{c} | \mathbf{x})^w / Z(\mathbf{c})
+p_{\text{guided}}(\mathbf{x} | \mathbf{c}) \propto \frac{p(\mathbf{x} | \mathbf{c})^w}{p(\mathbf{x})^{w-1}} = \frac{p(\mathbf{x})\,p(\mathbf{c} | \mathbf{x})^w}{Z(\mathbf{c})}
 $$
 
-（等价地也可写为 $\propto p(\mathbf{c}|\mathbf{x})^w \cdot p(\mathbf{x})^{1-w}$ 的 Bayes 形式，但须与左侧 $p(\mathbf{x}|\mathbf{c})^w/p(\mathbf{x})^{w-1}$ 一致；勿写成 $p(\mathbf{x}|\mathbf{c})^w/p(\mathbf{x})$ 却再等于 $p(\mathbf{c}|\mathbf{x})^w p(\mathbf{x})^{1-w}$ 的错误等式。）
-$$
+其中 $Z(\mathbf{c})$ 为归一化常数。注意：上式**不等于** $p(\mathbf{c}|\mathbf{x})^w \cdot p(\mathbf{x})^{1-w}$（后者少了一个 $p(\mathbf{x})$ 的幂次），也不应写成 $p(\mathbf{x}|\mathbf{c})^w/p(\mathbf{x})$ 却再与 $p(\mathbf{c}|\mathbf{x})^w p(\mathbf{x})^{1-w}$ 划等号。
 
 当 $w > 1$ 时，分布被尖锐化（sharpened），更集中于条件 $\mathbf{c}$ 所指示的区域；当 $w < 1$ 时，分布被平坦化（flattened），增加了多样性。
 
