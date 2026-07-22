@@ -125,10 +125,10 @@
 
 **近期相关 commit（本机）**：
 ```
-（本轮）fix: R7 full re-read — high-confidence hard errors across 24 chapters
+0e3ca38 fix: R8 full re-read — high-confidence hard errors across 24 chapters
+89f0e1f fix: R7 full re-read — remaining high-confidence errors + HANDOVER
 59ef12c fix: R7 full re-read — high-confidence hard errors (partial, 17 chapters)
 c7079f4 fix: R6 full re-read — high-confidence hard errors across 24 chapters
-f24acc9 docs: HANDOVER — record R5 full-read review completion
 2e0a5a0 fix: R5 full-read review — high-confidence hard errors across 24 chapters
 ```
 
