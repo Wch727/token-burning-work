@@ -62,10 +62,11 @@
 | Round 5 | **6 组全量通读** 24 章（非抽检、无条数上限） | ~70+ 条 high（公式/史实/基准/归属） | 已修 → `2e0a5a0` |
 | Round 6 | **6 组全量复审** 24 章（非抽检、无条数上限） | ~79 条 high（AlexNet 口径/DBN 拓扑/公式/法规编号/交叉引用等） | 已修 → `c7079f4` |
 | Round 7 | **6 组全量复审** 24 章 | ~50+ 条 high（IBM 701、PCD、SORT/ByteTrack、CFG/VAE KL、C4/α_C、Shapley 公理等） | 已修 → `89f0e1f` |
-| Round 8 | **6 组全量复审** 24 章 | ~50 条 high（AI 冬天口径、SMO/SAMME、AlexNet 算术、FlashAttention/FIM、3DGS 排序、AI 法案罚款等）；ch17–20 返回 `[]` | 已修（本轮） |
+| Round 8 | **6 组全量复审** 24 章 | ~50 条 high（AI 冬天口径、SMO/SAMME、AlexNet 算术、FlashAttention/FIM、3DGS 排序、AI 法案罚款等）；ch17–20 返回 `[]` | 已修 → `0e3ca38` |
+| Round 9 | **6 组全量复审** 24 章 | ch01–04 返回 `[]`；其余约 30+ 条 high（DBN 顶层公式、SAMME、AlexNet FLOPs/分组参数、sFID、Toolformer/GPT-J、MATH/SWE-bench 等） | 已修（本轮） |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：R5 起恢复全量通读；R8 后脚本仍 0 findings，且 ch17–20 复审已返回 `[]`。可再开 R9 确认是否全局趋近 `[]`。
+**停止准则**：R5 起恢复全量通读；R9 后脚本仍 0 findings，且 ch01–04 已返回 `[]`。可再开 R10 确认是否全局趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -125,9 +126,9 @@
 
 **近期相关 commit（本机）**：
 ```
+（本轮）fix: R9 full re-read — high-confidence hard errors + HANDOVER
 0e3ca38 fix: R8 full re-read — high-confidence hard errors across 24 chapters
 89f0e1f fix: R7 full re-read — remaining high-confidence errors + HANDOVER
-59ef12c fix: R7 full re-read — high-confidence hard errors (partial, 17 chapters)
 c7079f4 fix: R6 full re-read — high-confidence hard errors across 24 chapters
 2e0a5a0 fix: R5 full-read review — high-confidence hard errors across 24 chapters
 ```

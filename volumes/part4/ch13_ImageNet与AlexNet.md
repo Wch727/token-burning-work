@@ -85,12 +85,12 @@ AlexNet的完整架构如**表13-1**所示。网络共有8个可学习层（5个
 | 1 | Conv1 | 55×55×96 | 11×11 / 4 | 96 | ReLU | — | 35K |
 | — | LRN1 | 55×55×96 | — | — | — | — | — |
 | — | MaxPool1 | 27×27×96 | 3×3 / 2 | — | — | — | — |
-| 2 | Conv2 | 27×27×256 | 5×5 / 1, pad=2 | 256 | ReLU | — | 615K |
+| 2 | Conv2 | 27×27×256 | 5×5 / 1, pad=2 | 256 | ReLU | — | 307K |
 | — | LRN2 | 27×27×256 | — | — | — | — | — |
 | — | MaxPool2 | 13×13×256 | 3×3 / 2 | — | — | — | — |
 | 3 | Conv3 | 13×13×384 | 3×3 / 1, pad=1 | 384 | ReLU | — | 885K |
-| 4 | Conv4 | 13×13×384 | 3×3 / 1, pad=1 | 384 | ReLU | — | 1.3M |
-| 5 | Conv5 | 13×13×256 | 3×3 / 1, pad=1 | 256 | ReLU | — | 885K |
+| 4 | Conv4 | 13×13×384 | 3×3 / 1, pad=1 | 384 | ReLU | — | 664K |
+| 5 | Conv5 | 13×13×256 | 3×3 / 1, pad=1 | 256 | ReLU | — | 442K |
 | — | MaxPool3 | 6×6×256 | 3×3 / 2 | — | — | — | — |
 | 6 | FC6 | 4096 | — | — | ReLU | 0.5 | 37.6M |
 | 7 | FC7 | 4096 | — | — | ReLU | 0.5 | 16.8M |
@@ -159,10 +159,10 @@ $$
 对于Conv1，单张图像的前向传播浮点运算次数（FLOPs，包含乘法和加法）：
 
 $$
-\text{FLOPs}_{Conv1} = 96 \times 55 \times 55 \times (2 \times 11 \times 11 \times 3 - 1) \approx 105M
+\text{FLOPs}_{Conv1} = 96 \times 55 \times 55 \times (2 \times 11 \times 11 \times 3 - 1) \approx 211M
 $$
 
-其中乘以2是因为每次乘加操作计为2次浮点运算，减去1是因为偏置项不需要乘法。乘以55×55是因为特征图有3025个空间位置。
+其中乘以2是因为每次乘加操作计为2次浮点运算，减去1是因为偏置项不需要乘法。若仅计乘加次数（MACs，不含将一次乘加拆成两次浮点运算），则约为 $96 \times 55 \times 55 \times (11 \times 11 \times 3) \approx 105M$ MACs。乘以55×55是因为特征图有3025个空间位置。
 
 ### 第4.3节 ReLU激活函数
 
@@ -572,7 +572,7 @@ $$
 
 AlexNet总共进行了约 $1,200,000 \times 90 \approx 108M$ 次前向传播，总共约 $2.4G \times 108M \approx 2.6 \times 10^{17}$ 次乘加运算。考虑到反向传播的计算量约是前向传播的2倍，总计算量约 $7.8 \times 10^{17}$ 次浮点运算。
 
-训练以**单精度（FP32）**为主。单块GTX 580峰值单精度约1.5–1.6 TFLOPS（双精度仅约0.2 TFLOPS，约为SP的1/8，不宜用于训练吞吐估算）。按约1.6 TFLOPS计，理论上 $7.8 \times 10^{17} / 1.6 \times 10^{12} \approx 487,500$ 秒 $\approx 135$ 小时 $\approx 13.6$ 天。考虑到：
+训练以**单精度（FP32）**为主。单块GTX 580峰值单精度约1.5–1.6 TFLOPS（双精度仅约0.2 TFLOPS，约为SP的1/8，不宜用于训练吞吐估算）。按约1.6 TFLOPS计，理论上 $7.8 \times 10^{17} / 1.6 \times 10^{12} \approx 487,500$ 秒 $\approx 135$ 小时 $\approx 5.6$ 天。考虑到：
 - 数据加载和预处理的开销
 - 两块GPU之间交叉连接的同步与PCIe传输等待
 - CUDA内核启动开销
@@ -840,7 +840,7 @@ $$
 | PReLU | $[0, \infty)$ | $1$ | $(-\infty, 0)$ | $\alpha > 0$ | 不会死亡 |
 | ELU | $[0, \infty)$ | $1$ | $(-\alpha, 0)$ | $\alpha e^x$ | 不会死亡 |
 
-在实际ImageNet训练中，He等人于2015年发表的《Delving Deep into Rectifiers》论文系统对比了不同激活函数在ImageNet上的表现。使用ReLU的ResNet-50达到约24%的Top-1错误率，而使用LeakyReLU（$\alpha=0.01$）的ResNet-50达到约23.5%的Top-1错误率，使用ELU的ResNet-50达到约23.3%的Top-1错误率。然而，这些改进的幅度相对较小（约0.5至1个百分点），考虑到LeakyReLU和ELU相比ReLU增加了计算复杂度和内存占用，ReLU仍然是大多数现代网络架构的首选激活函数。在AlexNet的训练中，Sutskever的实验已经证明ReLU相比Sigmoid和Tanh具有压倒性优势——使用Sigmoid的8层网络几乎无法收敛，而使用ReLU的网络能够在合理轮数内达到可接受的性能。
+在实际ImageNet训练中，He等人于2015年发表的《Delving Deep into Rectifiers》系统研究了ReLU族激活，并提出了**参数化ReLU（PReLU）**——负半轴斜率 $\alpha$ 由数据学习而非手工固定。该文在其深层模型上表明PReLU相对ReLU可进一步降低错误率，并帮助其网络在ImageNet Top-5上达到约4.94%，首次超过当时报道的人类水平表现。需要区分的是：ResNet-50本身出自He等人2016年的残差网络工作，并非该2015年整流器论文的实验载体；后续关于LeakyReLU、ELU等变体的对比也多见于其他研究，相对ReLU的增益通常有限。考虑到额外超参与实现开销，ReLU仍然是大多数现代网络架构的首选激活函数。在AlexNet的训练中，Sutskever的实验已经证明ReLU相比Sigmoid和Tanh具有压倒性优势——使用Sigmoid的8层网络几乎无法收敛，而使用ReLU的网络能够在合理轮数内达到可接受的性能。
 
 ## 第8节 2012年后的连锁反应
 
@@ -884,7 +884,7 @@ AlexNet的成功也推动了AI专用硬件的快速发展。
 
 NVIDIA的CUDA平台在AlexNet时代已经相对成熟，GTX 580提供了在当时看来足够的计算能力。但随着深度学习模型规模的增长（从AlexNet的6000万参数到后来的GPT-3的1750亿参数），对计算能力的需求呈指数增长。
 
-这直接催生了：NVIDIA Tesla K80（2014年）：双GPU设计，24 GB显存，专为数据中心设计；NVIDIA Tesla P100（2016年）：采用Pascal架构，16 GB HBM2显存，首次引入FP16（半精度）训练支持，峰值性能达21 TFLOPS；Google TPU（2016年）：专为TensorFlow设计的ASIC芯片，专注于推理和训练的矩阵运算，第一代TPU仅用于推理，峰值性能达92 TFLOPS；Google TPU v2（2017年）：支持训练和推理，峰值性能达180 TFLOPS；NVIDIA Tesla V100（2017年）：采用Volta架构，引入Tensor Core，专门加速混合精度矩阵乘加运算，峰值性能达100 TFLOPS；Google TPU v3（2018年）：峰值性能达180 TFLOPS，支持更大的模型并行；NVIDIA A100（2020年）：采用Ampere架构，峰值性能达624 TFLOPS（稀疏精度），显存提升至80 GB HBM2e；Google TPU v4（2021年）：峰值性能达275 TFLOPS，互联带宽提升至1.6 TB/s；
+这直接催生了：NVIDIA Tesla K80（2014年）：双GPU设计，24 GB显存，专为数据中心设计；NVIDIA Tesla P100（2016年）：采用Pascal架构，16 GB HBM2显存，首次引入FP16（半精度）训练支持，峰值性能达21 TFLOPS；Google TPU（2016年）：专为TensorFlow设计的ASIC芯片，专注于推理和训练的矩阵运算，第一代TPU仅用于推理，峰值性能达92 TFLOPS；Google TPU v2（2017年）：支持训练和推理，**单板（board）**峰值约180 TFLOPS；NVIDIA Tesla V100（2017年）：采用Volta架构，引入Tensor Core，专门加速混合精度矩阵乘加运算，峰值性能达100 TFLOPS；Google TPU v3（2018年）：相对v2进一步提升，**单板峰值约420 TFLOPS**，支持更大的模型并行；NVIDIA A100（2020年）：采用Ampere架构，峰值性能达624 TFLOPS（稀疏精度），显存提升至80 GB HBM2e；Google TPU v4（2021年）：峰值性能达275 TFLOPS，互联带宽提升至1.6 TB/s；
 - **NVIDIA Tesla K80**（2014年）：双GPU设计，24 GB显存，专为数据中心设计。
 - **NVIDIA Tesla P100**（2016年）：采用Pascal架构，16 GB HBM2显存，首次引入FP16（半精度）训练支持，峰值性能达21 TFLOPS。
 - **Google TPU**（2016年）：专为TensorFlow设计的ASIC芯片，专注于推理和训练的矩阵运算。
@@ -1050,13 +1050,18 @@ $$
 
 其中 $\text{RF}^{(l)}$ 是第 $l$ 层的感受野大小，$K^{(l)}$ 是第 $l$ 层卷积核大小，$S^{(i)}$ 是第 $i$ 层的步长。
 
-对于AlexNet：
-- Conv1: $\text{RF} = 11$
-- Conv2: $\text{RF} = 11 + (5-1) \times 4 = 27$
-- Conv3: $\text{RF} = 27 + (3-1) \times 4 \times 2 = 43$（考虑池化层步长2的影响需调整计算）
-- 精确计算需考虑池化层的累积效应
+精确计算需逐层更新感受野 $\text{RF}$ 与有效步长（jump）$j$。对核大小 $k$、步长 $s$ 的层：$\text{RF} \leftarrow \text{RF} + (k-1)\cdot j$，$j \leftarrow j \cdot s$。AlexNet从输入 $\text{RF}=1,\; j=1$ 起：
 
-到FC6层，感受野覆盖了整个输入图像（$227 \times 227$），这意味着全连接层看到了图像的全局信息。
+- Conv1（$k=11,s=4$）：$\text{RF}=11$，$j=4$
+- MaxPool1（$k=3,s=2$）：$\text{RF}=11+(3-1)\times 4=19$，$j=8$
+- Conv2（$k=5,s=1$）：$\text{RF}=19+(5-1)\times 8=51$，$j=8$
+- MaxPool2（$k=3,s=2$）：$\text{RF}=51+(3-1)\times 8=67$，$j=16$
+- Conv3（$k=3,s=1$）：$\text{RF}=67+(3-1)\times 16=99$，$j=16$
+- Conv4（$k=3,s=1$）：$\text{RF}=99+(3-1)\times 16=131$，$j=16$
+- Conv5（$k=3,s=1$）：$\text{RF}=131+(3-1)\times 16=163$，$j=16$
+- MaxPool3（$k=3,s=2$）：$\text{RF}=163+(3-1)\times 16=195$，$j=32$
+
+到FC6层，感受野已接近覆盖整个输入图像（$227 \times 227$；池化后特征图空间尺寸为 $6\times 6$，再经全连接即全局聚合），这意味着全连接层看到了图像的全局信息。
 
 ### 第10.3节 第二层（Conv2）：纹理与简单图案
 

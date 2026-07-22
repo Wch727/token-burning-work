@@ -35,10 +35,10 @@ $$r_t = \sigma(W_r x_t + U_r h_{t-1} + b_r)$$
 **候选隐藏状态** $\tilde{h}_t$ 融合了当前输入和重置后的历史信息：
 $$\tilde{h}_t = \tanh(W_h x_t + U_h(r_t \odot h_{t-1}) + b_h)$$
 
-**最终隐藏状态** $h_t$ 以更新门为权重，在过去的隐藏状态和新候选状态之间进行插值：
-$$h_t = z_t \odot h_{t-1} + (1 - z_t) \odot \tilde{h}_t$$
+**最终隐藏状态** $h_t$ 以更新门为权重，在过去的隐藏状态和新候选状态之间进行插值（Cho et al. 2014 原文约定）：
+$$h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t$$
 
-其中 $\sigma$ 是sigmoid激活函数，$\odot$ 表示逐元素乘法。特别地，当更新门 $z_t \approx 1$ 时，信息几乎不受影响地通过；当 $z_t \approx 0$ 时，隐藏状态完全由当前输入决定。这种机制使GRU能够在保持长程信息的同时，灵活地吸收新的输入内容。
+其中 $\sigma$ 是sigmoid激活函数，$\odot$ 表示逐元素乘法。特别地，当更新门 $z_t \approx 1$ 时，隐藏状态主要取新候选 $\tilde{h}_t$；当 $z_t \approx 0$ 时，几乎保留 $h_{t-1}$。这种机制使GRU能够在保持长程信息的同时，灵活地吸收新的输入内容。需要注意：部分教材与实现采用相反写法 $h_t = z_t \odot h_{t-1} + (1-z_t)\odot\tilde{h}_t$（此时 $z$ 表示“保留门”），与Cho原文仅差 $z\leftrightarrow(1-z)$ 的命名约定，二者等价。
 
 编码器读取整个输入序列后，最终的隐藏状态 $h_{T_x}$ 被作为整个输入序列的总结向量，通常称为上下文向量（context vector）$c$：
 
@@ -587,7 +587,7 @@ $$\mathbf{x}_{l+1} = \text{LayerNorm}(\mathbf{x}_l + \text{Sublayer}_l(\mathbf{x
 
 $$\mathbf{x}_{l+1} = \mathbf{x}_l + \text{Sublayer}_l(\text{LayerNorm}(\mathbf{x}_l))$$
 
-后归一化的理论优势在于保持了残差分支的恒等映射，梯度可以更直接地流回底层。但后归一化在训练深层模型时可能面临优化困难，这一问题在后续的研究中（如BERT、GPT等预训练模型）中得到了广泛讨论，现代大语言模型普遍采用前归一化方案。
+原始Transformer采用的是**后归一化（post-norm）**。相比之下，**前归一化（pre-norm）** 的残差分支保持了更干净的恒等映射路径（$\mathbf{x}_{l+1}=\mathbf{x}_l+\cdots$），梯度可以更直接地流回底层，因而在深层网络中通常更易优化、训练更稳定。后归一化在训练很深的模型时更容易出现优化困难，这一问题在后续研究中得到广泛讨论；BERT、GPT 及现代大语言模型普遍采用前归一化（或其后继变体）方案。
 
 ### 第5.6节 前馈网络（Feed-Forward Network）的设计
 
@@ -647,7 +647,7 @@ $$M_{ij} = M^{\text{causal}}_{ij} + M^{\text{pad}}_{ij}$$
 
 原始Transformer的训练涉及多项关键的工程技巧和正则化策略，这些细节对于复现论文结果和稳定训练深层模型至关重要。
 
-**参数初始化**：Vaswani等人采用了He初始化（或称Kaiming初始化）方案，对于线性层和注意力投影层，权重矩阵$W$的每个元素从$\mathcal{N}(0, \sqrt{2/d_{\text{in}}})$中采样，其中$d_{\text{in}}$是输入特征维度。这种初始化确保信号在前向传播时保持合理的方差，避免梯度消失或爆炸。
+**参数初始化**：Vaswani等人采用的是**Xavier/Glorot初始化**（而非He/Kaiming初始化）。对于线性层和注意力投影层，权重矩阵$W$的元素按输入/输出维度缩放方差（如从 $\mathcal{U}\!\left(-\sqrt{6/(d_{\text{in}}+d_{\text{out}})},\sqrt{6/(d_{\text{in}}+d_{\text{out}})}\right)$ 或等价的零均值高斯形式采样）。这种初始化旨在使信号在前向与反向传播时保持合理的方差，避免梯度消失或爆炸。
 
 **Dropout**：Transformer在三个位置应用了Dropout：1）在注意力权重矩阵经过softmax之后；2）在前馈网络的隐藏层输出之后；3）在位置嵌入与词嵌入相加之后。Dropout率统一设置为$P_{\text{drop}} = 0.1$。在推理时，所有Dropout层自动禁用，模型变为确定性函数。
 
@@ -870,13 +870,19 @@ Transformer相比RNN的并行化优势可以通过具体的硬件利用率数据
 
 从实际应用的角度，Transformer和RNN的计算复杂度比较需要更精细的分析。自注意力的二次方复杂度 $O(n^2 \cdot d)$ 在序列长度增加时会迅速 dominates 前馈网络的线性复杂度 $O(n \cdot d_{\text{ff}})$。对于一个包含 $N=6$ 层、每层 $h=8$ 个头、模型维度 $d_{\text{model}}=512$ 的标准Transformer编码器，处理长度为 $n=512$ 的序列时，自注意力层的总浮点运算次数（FLOPs）约为：
 
-$$\text{FLOPs}_{\text{self-attn}} \approx 8 \times 6 \times \left[ 3 \times (512 \times 512 \times 512) + (512 \times 512 \times 512) + \text{softmax} \right] \approx 8 \times 6 \times 4 \times 134\text{M} \approx 25.6\text{B}$$
+Q/K/V 与输出投影是在完整的 $d_{\text{model}}$ 上各做一次，**不应再乘以头数**；多头只把注意力的 $n\times n$ 运算分到各头的 $d_k$ 上，合计仍为 $O(n^2 d_{\text{model}})$。单层自注意力（忽略softmax与偏置）约为：
 
-其中 $3 \times (512 \times 512 \times 512)$ 对应 Q、K、V 的线性投影，$(512 \times 512 \times 512)$ 对应 QK^T 与 V 的矩阵乘法。相比之下，同等规模的4层LSTM（隐藏维度1024）处理相同序列的FLOPs约为：
+$$\text{FLOPs}_{\text{self-attn}}^{\text{(1 layer)}} \approx 4\, n\, d_{\text{model}}^2 + 2\, n^2\, d_{\text{model}}$$
+
+对 $N=6$、$n=d_{\text{model}}=512$：
+
+$$\text{FLOPs}_{\text{self-attn}} \approx 6 \times \bigl[4\times(512\cdot 512^2) + 2\times(512^2\cdot 512)\bigr] = 6 \times 6 \times 134\text{M} \approx 4.8\text{B}$$
+
+其中 $4\,n\,d^2$ 对应 Q、K、V 与输出投影（各一次 $d\times d$），$2\,n^2 d$ 对应各头合计的 $\mathrm{QK}^\top$ 与加权 $V$。相比之下，同等规模的4层LSTM（隐藏维度1024）处理相同序列的FLOPs约为：
 
 $$\text{FLOPs}_{\text{LSTM}} \approx 4 \times 512 \times 4 \times (1024 \times 1024) \approx 8.5\text{B}$$
 
-从这个角度看，LSTM的FLOPs实际上低于Transformer编码器。然而，FLOPs并非决定实际运行时间的唯一因素——内存访问模式、并行化程度和硬件利用率同样关键。Transformer的自注意力操作是高度结构化的矩阵乘法，可以被cuBLAS等库优化到接近硬件的理论峰值；而LSTM的逐时间步计算涉及大量分散的内存读写，实际硬件利用率往往不足理论值的10%。这种"理论FLOPs低但实际运行慢"的现象在并行计算领域被称为**并行化差距（parallelization gap）**，是Transformer在实践中最被低估的优势之一。
+从这个角度看，仅就自注意力子层的 FLOPs 而言，标准 Transformer 编码器甚至可低于上述 LSTM 估算；但若计入每层 FFN（约 $2\,n\,d_{\text{model}}\,d_{\text{ff}}$），总计算量通常仍与或高于同等规模 RNN。更重要的是，FLOPs并非决定实际运行时间的唯一因素——内存访问模式、并行化程度和硬件利用率同样关键。Transformer的自注意力操作是高度结构化的矩阵乘法，可以被cuBLAS等库优化到接近硬件的理论峰值；而LSTM的逐时间步计算涉及大量分散的内存读写，实际硬件利用率往往不足理论值的10%。这种"理论FLOPs低但实际运行慢"的现象在并行计算领域被称为**并行化差距（parallelization gap）**，是Transformer在实践中最被低估的优势之一。
 
 ---
 
