@@ -950,7 +950,7 @@ NIPS的深度学习论文数量也呈现类似的爆炸式增长。
 AlexNet之后，一系列改进架构相继提出：
 - **2013年**：Zeiler和Fergus发表了《Visualizing and Understanding Convolutional Networks》，引入了DeconvNet用于特征可视化，发现了ReLU的Dying问题并提出了修正方案。
 - **2014年**：VGGNet（Simonyan & Zisserman）证明了使用3×3小卷积核堆叠可以获得与较大卷积核相当或更好的性能；GoogLeNet（Szegedy et al.）引入了Inception模块和1×1卷积。
-- **2015年**：ResNet（He et al.）引入了残差连接（skip connection），使网络深度达到了152层乃至更深的1000+层，ImageNet Top-5错误率降至3.57%，首次低于人类水平。
+- **2015年**：ResNet（He et al.）引入了残差连接（skip connection），使网络深度达到了152层乃至更深的1000+层，ImageNet Top-5 集成错误率降至 3.57%（进一步低于人类水平；He et al. 2015 整流器结果约 4.94% 已首次超过当时报道的人类约 5.1%）。
 - **2017年**：Transformer（Vaswani et al.）和SENet（Hu et al.）分别在序列建模和视觉领域取得突破。
 
 **人才的流动与创业潮**
