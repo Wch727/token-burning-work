@@ -73,13 +73,12 @@ $$
 ```
 FUNCTION TuringStep(M, q, σ):
     (q', σ', d) ← δ_M(q, σ)
-    IF q' = q_f THEN RETURN HALT
     WRITE σ' ON CURRENT CELL
     IF d = L THEN MOVE HEAD LEFT BY ONE
     ELSE IF d = R THEN MOVE HEAD RIGHT BY ONE
     ELSE IF d = S THEN STAY AT CURRENT CELL
     SET CURRENT STATE ← q'
-    RETURN CONTINUE
+    RETURN CONTINUE   # 终止态写/移/改状态后由 TuringRun 判定
 ```
 
 **伪代码2：图灵机完整计算过程**
@@ -91,10 +90,9 @@ FUNCTION TuringRun(M, input_string):
     SET HEAD POSITION ← 0
     CURRENT STATE ← q_0
     LOOP:
-        σ ← READ SYMBOL AT HEAD
         IF CURRENT STATE = q_f THEN RETURN HALTED(TAPE)
-        status ← TuringStep(M, CURRENT STATE, σ)  # TuringStep 已完成写符号、移头、改状态
-        IF status = HALT THEN RETURN HALTED(TAPE)
+        σ ← READ SYMBOL AT HEAD
+        TuringStep(M, CURRENT STATE, σ)  # 始终完成写符号、移头、改状态
     END LOOP
 ```
 

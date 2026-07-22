@@ -69,11 +69,12 @@
 | Round 12 | **6 组全量复审** 24 章 | 约 33 条 high（Entscheidungsproblem、DiagonalTM、DBN VC、AlexNet 2010/2012 混用、ViT 87.12%、CFG、GAIL、StarCoder 512、Omohundro 六驱动力等） | 已修 → `7a3ce4d` |
 | Round 13 | **6 组全量复审** 24 章 | 约 28 条 high（Fisher 渐近、MEMM 标签偏差、LeNet-5 层数、Viola–Jones 6061、VGG-19 参数、StyleGAN FID、RoBERTa 86.4、BCQ、ToT/YOLOv7/DeepLabv3 等）；ch01 组超时无新报 | 已修 → `9f4f651` |
 | Round 14 | **6 组全量复审** 24 章（分两批） | 第一批 → `5f97fdb`；第二批 → `67da055` | 已闭环 |
-| Round 15 | **6 组全量复审** 24 章 | ~40+ 条 high（LT 反向链/Samuel 特征/Williams 刷新、VC 正弦与 2k+1、MaxEnt/MRF 符号、NEG/ROUGE、BM 指数、TPU v1、R-operator、Sutskever/DeepMind、标签平滑、WGAN clipping、BERT NSP、ViT/SD/SDEdit、IRM/NTK、RL 时间线括号、推测解码/RetinaNet/RotatE/RLHF/BigBench/RDP/EvalPlus 等） | **本 commit** |
+| Round 15 | **6 组全量复审** 24 章 | ~40+ 条 high | 已修 → `f80984e` |
+| Round 16 | **6 组全量复审** 24 章 | ~40+ 条 high（TuringStep 停机语义、Eccles/Minsky 门生、Ashby 书名、SRC/FGCS 预算、VC/GBDT/SOM/GT/GloVe、DBN/ImageNet/p3、LRN/标签平滑/f-div、NSP/NTK/SAC/CQL、StarCoder/Chinchilla/Focal/DP-SGD 等） | **本 commit** |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 | 仓库卫生 | 删除根目录 `ch18-test.md`、`fix_ch24.js` | → `7416068` | 已完成 |
 
-**停止准则**：R15 已修一轮；下一步可再开 **R16** 确认是否趋近 `[]`。
+**停止准则**：R16 已修一轮；可再开 **R17** 确认是否趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 

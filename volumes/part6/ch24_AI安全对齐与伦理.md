@@ -374,13 +374,14 @@ $$D_\alpha(\mathcal{M}^k(D) \| \mathcal{M}^k(D')) \leq k \cdot D_\alpha(\mathcal
 
 机制选择。在深度学习的每一轮SGD中，对每个小批量（mini-batch）的梯度进行裁剪（gradient clipping），然后添加噪声，这就是差分隐私SGD（DP-SGD）的核心思路。Abadi等人（2016）提出的DP-SGD算法包含两个关键步骤：
 
-步骤1：梯度剪裁。对于小批量梯度 $g_t = \frac{1}{B} \sum_{i \in B_t} \nabla_\theta \ell(f_\theta(x_i), y_i)$，将其 L2-范数裁剪到阈值 $C$：
+步骤1：**逐样本**梯度剪裁。对每个样本 $i$ 的梯度 $\nabla_\theta \ell_i$ 分别裁剪 $\|\nabla_\theta \ell_i\|_2\le C$，再平均：
 
-$$\bar{g}_t = g_t \cdot \min(1, C / \|g_t\|_2)$$
+$$\bar{g}_t = \frac{1}{B}\sum_{i\in B_t}\mathrm{clip}(\nabla_\theta \ell_i, C),\qquad
+\mathrm{clip}(g,C)=g\cdot\min\!\big(1, C/\|g\|_2\big)$$
 
-梯度剪裁确保每个样本对梯度的贡献被限制在 C 以内，从而控制单个样本对模型参数的最大影响，直接限制了 L2-敏感度。
+对 batch 均值做一次裁剪**不能**保证单样本敏感度 $\le C$；Abadi 等 DP-SGD 必须 per-example clip。
 
-步骤2：添加噪声。在裁剪后的梯度上添加Gaussian噪声：
+步骤2：添加噪声。在裁剪平均后的梯度上添加Gaussian噪声：
 
 $$\tilde{g}_t = \bar{g}_t + \mathcal{N}(0, \sigma^2 C^2 I)$$
 
@@ -400,7 +401,7 @@ $$\Delta \theta_t = -\eta \cdot \bar{g}_t = -\eta \cdot g_t \cdot \min(1, C / \|
 
 当 ||g_t||_2 > C 时，更新步长的 L2-范数被限制为 eta C，防止了梯度爆炸（gradient explosion）。Pascanu等人（2013）证明，在LSTM等循环网络中，梯度范数以指数速率增长，裁剪是训练的稳定化必要条件。
 
-从隐私理论角度，梯度剪裁将每个样本对梯度的贡献限制在 C 以内，从而将 L2-敏感度上界为 C（在单样本小批量情况下）或 sqrt{B} * C（在批量大小为 B 时）。结合Gaussian机制，每步添加的噪声方差为 sigma^2 C^2，总体隐私损失通过moments accountant精确跟踪。
+从隐私理论角度，逐样本裁剪到 $C$ 后：若对裁剪梯度**求和**则 L2 敏感度 $O(C)$；若再**除以 $B$ 取平均**则敏感度上界为 $C/B$（或 $2C/B$，视邻接定义）。**$\sqrt{B}\cdot C$ 不是**标准 DP-SGD 敏感度。噪声常按 $\sigma C$ 标定并与平均/求和方式一致。
 
 梯度剪裁的替代方案。近年来的研究表明，在某些设置下，梯度剪裁可能并非必要。Iliadis等人（2023）提出，当批量大小 B 足够大时（例如 B >= 256），中心极限定理使得梯度噪声天然地近似Gaussian分布，此时可以使用更温和的梯度裁剪策略，甚至使用auto-clip（自适应裁剪阈值）来动态调整 C，在保持隐私保证的同时提升模型精度。
 

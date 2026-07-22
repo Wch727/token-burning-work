@@ -125,15 +125,11 @@ $$\sum_{c=0}^{\infty} P(w \mid h, c_{\text{observed}} = c) = 1$$
 
 在实践中，$N_c$ 对于 $c > k$ 的估计存在较大方差，特别是当 $b > 1$ 时，$N_c$ 衰减很快，小误差会导致概率质量估计出现显著偏差。因此，Good-Turing平滑通常只使用前 $k$ 个 $N_c$ 值的经验估计，对更高频事件回退到MLE。
 
-**概率质量守恒的严格验证。** 对所有历史 $h$，Good-Turing估计的概率质量之和应该为1：
+**概率质量守恒的严格验证。** Good-Turing 的 $c^*/N$ 是**全局类型（type）概率质量**，不是按历史条件化的 $P(w\mid h)$。全局有：
 
-$$\sum_{c=0}^{\infty} P_{\text{GT}}(c \mid h) = \sum_{c=0}^{\infty} \frac{N_c \cdot c^*}{N} = \frac{1}{N} \sum_{c=0}^{\infty} N_c \cdot (c+1) \frac{N_{c+1}}{N_c}$$
+$$\sum_{c=0}^{\infty} N_c \cdot \frac{c^*}{N} = 1$$
 
-注意到 $N_c$ 是恰好出现 $c$ 次的n-gram数量，因此 $\sum_{c=0}^{\infty} (c+1) N_{c+1} = \sum_{c=1}^{\infty} c \cdot N_c = N$（所有计数的总和）。于是：
-
-$$\sum_{c=0}^{\infty} P_{\text{GT}}(c \mid h) = \frac{N}{N} = 1$$
-
-这证明了Good-Turing估计的完备性——它是一个合法的概率分布。
+（因 $\sum_c (c+1)N_{c+1}=\sum_c c N_c=N$）。条件分布 $P(w\mid h)$ 仍须在固定 $h$ 上对词 $w$ 归一化，并配合回退/插值；不宜写成对每个历史 $h$ 均有 $\sum_c P_{\mathrm{GT}}(c\mid h)=1$。
 
 **优势与局限。** Good-Turing平滑的优势在于其非参数性——它不依赖于参数化假设，纯粹从频率计数中推断概率。这使得它对分布形状不敏感，在理论上具有广泛的适用性。然而，其缺点也十分明显：首先，对于高频事件（$c$ 较大），$N_c$ 的样本极少，线性回归外推的不确定性大，导致估计方差高；其次，当 $N_c = 0$ 时（对于某些 $c$），公式出现 $0/0$ 的未定义情况，需要特殊处理（如忽略该 $c$ 值，或使用相邻的 $N_c$ 进行平滑）；第三，Good-Turing估计对计数 $c$ 的敏感度在 $c$ 较大时下降过快，导致概率质量过于集中在极高频n-gram上；第四，非参数方法需要存储所有 $N_c$ 值，在 $V$ 较大时内存开销不可接受。这些局限性促使了Kneser-Ney等参数化平滑方法的发展。
 
@@ -600,7 +596,7 @@ $$\sum_{i, j} \left( \mathbf{w}_i^{\top} \tilde{\mathbf{w}}_j - \log X_{ij} \rig
 
 $$\| \mathbf{W} \tilde{\mathbf{W}}^{\top} - \mathbf{L} \|_F^2$$
 
-其中 $\mathbf{L}$ 是 $\log X_{ij}$ 组成的矩阵，$\| \cdot \|_F$ 是Frobenius范数。这是一个标准的矩阵分解问题：寻找秩-$N$ 矩阵 $\mathbf{W} \tilde{\mathbf{W}}^{\top}$ 来近似矩阵 $\mathbf{L}$。由于 $\mathbf{W}$ 和 $\tilde{\mathbf{W}}$ 不约束为正交或归一化，这实际上是加权非负矩阵分解（当对 $\mathbf{W}, \tilde{\mathbf{W}}$ 加上非负约束时）。
+其中 $\mathbf{L}$ 是 $\log X_{ij}$ 组成的矩阵，$\| \cdot \|_F$ 是Frobenius范数。这是一个标准的矩阵分解问题：寻找秩-$N$ 矩阵 $\mathbf{W} \tilde{\mathbf{W}}^{\top}$ 来近似矩阵 $\mathbf{L}$。由于 $\mathbf{W}$ 和 $\tilde{\mathbf{W}}$ 不约束为正交或归一化，这是对 $\log$ 共现矩阵的**加权低秩分解**；仅当显式加非负约束时才成为加权 NMF，不宜直接断言为 NMF。
 
 **与SGNS矩阵分解的等价性。** 将 $\log X_{ij}$ 展开：
 
