@@ -50,7 +50,7 @@ $$
 
 ### 第3.1节 Geoffrey E. Hinton：认知革命的火炬手
 
-Geoffrey E. Hinton，1947年出生于英国 Wimbledon。他的曾祖父是著名的逻辑学家和数学家George Boole（布尔代数创始人），这一家族学术传统可能影响了他对"表征学习"的终身兴趣。Hinton在剑桥大学获得实验心理学学士学位，后在爱丁堡大学获得人工智能博士学位。是认知心理学和计算机科学交叉领域最具影响力的科学家之一。1986年，Hinton与David Rumelhart和Ronald Williams合作发表了著名的论文《Learning representations by back-propagating errors》，首次提出了现代反向传播算法的完整框架，为多层神经网络的训练提供了可行的数学工具。这篇文章至今已被引用超过4万次，是机器学习领域最具影响力的论文之一。
+Geoffrey E. Hinton，1947年出生于英国 Wimbledon。他的高曾祖父（great-great-grandfather）是著名的逻辑学家和数学家George Boole（布尔代数创始人），这一家族学术传统可能影响了他对"表征学习"的终身兴趣。Hinton在剑桥大学获得实验心理学学士学位，后在爱丁堡大学获得人工智能博士学位。是认知心理学和计算机科学交叉领域最具影响力的科学家之一。1986年，Hinton与David Rumelhart和Ronald Williams合作发表了著名的论文《Learning representations by back-propagating errors》，首次提出了现代反向传播算法的完整框架，为多层神经网络的训练提供了可行的数学工具。这篇文章至今已被引用超过4万次，是机器学习领域最具影响力的论文之一。
 
 然而，Hinton的学术道路并非一帆风顺。1990年代，随着SVM的兴起，神经网络研究陷入了长达十多年的"AI寒冬"。大多数顶级会议拒绝接收神经网络相关的论文，研究经费被大幅削减，博士生们纷纷转向其他领域。但Hinton始终坚信神经网络的潜力，在多伦多大学继续他的独立研究。Hinton在多伦多大学期间培养了一代又一代的深度学习研究者，他的实验室被称为"深度学习界的哈佛"。2013年，Hinton离开多伦多大学加入Google，担任Google Brain团队的兼职负责人，同时继续在多伦多大学担任名誉教授。2018年，Hinton因在深度学习领域的奠基性贡献与Yann LeCun和Yoshua Bengio共同获得图灵奖。2023年，Hinton宣布离开Google，理由是希望自由地讨论人工智能的潜在风险，而不受公司商业利益的限制。
 
@@ -270,7 +270,7 @@ $$
 
 ### 第4.6节 Dropout正则化
 
-Dropout是AlexNet中防止过拟合的核心正则化技术，由Srivastava等人于2014年提出，在AlexNet的训练中被首次大规模成功应用。
+Dropout是AlexNet中防止过拟合的核心正则化技术：Hinton等人2012年在arXiv上提出（Improving neural networks by preventing co-adaptation of feature detectors），Srivastava等人2014年在JMLR正式发表完整版本；AlexNet是其最早的大规模成功应用之一。
 
 #### 第4.6.1节 Dropout的数学描述
 
@@ -410,7 +410,7 @@ $$
 
 在测试时，AlexNet对每张图像进行以下处理：
 - 将图像短边缩放至256像素
-- 从缩放后的图像中裁剪出5个 $256 \times 256$ 的区域（4个角 + 1个中心）
+- 从缩放后的图像中裁剪出5个 $224 \times 224$ 的区域（4个角 + 1个中心）
 - 对每个裁剪区域进行水平翻转
 - 总共得到10张 crops
 

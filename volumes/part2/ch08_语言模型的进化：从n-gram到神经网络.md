@@ -401,11 +401,15 @@ $$\hat{\mathbf{y}}_j = \text{softmax}(\mathbf{W} \mathbf{C}_{w_t} + \mathbf{b})$
 
 一个中心词产生 $2m$ 个预测目标，因此Skip-gram的训练样本数是CBOW的 $2m$ 倍。然而，Skip-gram在低频词和类比推理任务上表现更优——每个词直接作为输入，其嵌入向量在训练中被反复更新，获得更丰富的语义表示。
 
-**统一的优化目标。** CBOW和Skip-gram的完整最大似然目标为：
+**各自的优化目标。** CBOW 与 Skip-gram 是两种不同的训练目标，不应写成同一条联合损失。CBOW 的最大似然目标为：
 
-$$\mathcal{J}_{\text{MLE}}(\theta) = -\sum_{t=1}^T \left( \log P(w_t \mid w_{t-m}^{t-1}, w_{t+1}^{t+m}) + \sum_{\substack{j=-m \\ j \neq 0}}^m \log P(w_{t+j} \mid w_t) \right)$$
+$$\mathcal{J}_{\text{CBOW}}(\theta) = -\sum_{t=1}^T \log P\big(w_t \mid w_{t-m}^{t-1}, w_{t+1}^{t+m}\big)$$
 
-然而，直接优化上述目标需要在每个样本上计算 $O(V)$ 复杂度的softmax，这在 $V > 10^5$ 时不可行。Mikolov等人引入了两种关键技术来加速训练：负采样和层次Softmax。
+Skip-gram 的最大似然目标为：
+
+$$\mathcal{J}_{\text{SG}}(\theta) = -\sum_{t=1}^T \sum_{\substack{j=-m \\ j \neq 0}}^m \log P(w_{t+j} \mid w_t)$$
+
+实际训练时二者择一使用。无论采用哪一个，直接优化都需要在每个样本上计算 $O(V)$ 复杂度的 softmax，这在 $V > 10^5$ 时不可行。Mikolov 等人引入了两种关键技术来加速训练：负采样和层次 Softmax。
 
 ### 第4.2节 负采样
 
@@ -453,13 +457,13 @@ $$\frac{\partial \mathcal{J}_{\text{NEG}}}{\partial \mathbf{v}_c} = (1 - \sigma(
 
 同理，对 $\mathbf{v}_w$ 的梯度需要考虑正样本和所有负样本的贡献：
 
-$$\frac{\partial \mathcal{J}_{\text{NEG}}}{\partial \mathbf{v}_w} = \sigma(-\mathbf{v}_w^{\top} \mathbf{v}_c) \cdot (-\mathbf{v}_c) + \sum_{k=1}^K \sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k}) \cdot \mathbf{v}_{w_k}$$
+$$\frac{\partial \mathcal{J}_{\text{NEG}}}{\partial \mathbf{v}_w} = \sigma(-\mathbf{v}_w^{\top} \mathbf{v}_c) \cdot \mathbf{v}_c + \sum_{k=1}^K \sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k}) \cdot (-\mathbf{v}_{w_k})$$
 
-注意梯度的不对称性：正样本将 $\mathbf{v}_c$ 向 $-\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近1时，梯度趋近于0，表示"已足够接近"；当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近0时，梯度趋近于 $\mathbf{v}_w$，表示需要大幅靠近）；负样本将 $\mathbf{v}_{w_k}$ 向 $\mathbf{v}_w$ 方向推动（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k})$ 接近1时，梯度趋近于 $-\mathbf{v}_w$，表示需要大幅远离；当接近0时，梯度趋近于0，表示"已足够远离"）。
+按梯度上升更新时：正样本将 $\mathbf{v}_c$ 推向 $+\mathbf{v}_w$ 方向（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_c)$ 接近1时，梯度趋近于0，表示"已足够对齐"；当接近0时，梯度趋近于 $\mathbf{v}_w$，表示需要大幅靠近）；负样本则把 $\mathbf{v}_{w_k}$ 推向 $-\mathbf{v}_w$ 方向（当 $\sigma(\mathbf{v}_w^{\top} \mathbf{v}_{w_k})$ 接近1时，远离力度大；接近0时几乎不再更新）。
 
-这一梯度不对称性揭示了NEG的隐式几何结构：正样本对倾向于使向量靠近（拉近距离），负样本对倾向于使向量远离（推开距离）。最终，嵌入向量在语义空间中自发地组织成"相似词靠近、不相似词远离"的结构——这与Word2Vec的词向量可视化结果完全吻合。
+这一结构揭示了NEG的隐式几何：正样本对倾向于使向量靠近，负样本对倾向于使向量推开。最终，嵌入在语义空间中自发组织成"相似词靠近、不相似词远离"的结构——与 Word2Vec 的可视化结果一致。
 
-**NEG与矩阵分解的完整关系。** Levy和Goldberg（2014）的著名定理证明了SGNS的目标函数等价于对一个特定的 shifted PMI 矩阵进行非负矩阵分解。完整推导如下：
+**NEG与矩阵分解的完整关系。** Levy和Goldberg（2014）的著名结果证明了SGNS的目标函数等价于对一个特定的 shifted PMI 矩阵做低秩分解（low-rank factorization），而非非负矩阵分解（NMF）。完整推导如下：
 
 考虑SGNS的全局目标函数（对所有训练样本求和）：
 
@@ -495,7 +499,7 @@ $$\mathbf{v}_w^{\top} \mathbf{v}_c = \log \frac{P(w, c)}{P(w) P_n(c)} - \log K =
 
 $$\min_{\mathbf{W}, \mathbf{C}} \sum_{w, c} \left( \mathbf{W}_w^{\top} \mathbf{C}_c - \text{PMI}(w, c) + \log K \right)^2$$
 
-其中 $\mathbf{W}$ 和 $\mathbf{C}$ 分别是中心词矩阵和上下文词矩阵。令 $\mathbf{M} = \mathbf{W} \mathbf{C}^{\top}$，其中 $M_{wc} = \text{PMI}(w, c) - \log K$，则SGNS等价于对矩阵 $\mathbf{M}$ 的非负矩阵分解。Levy和Goldberg由此证明：SGNS学习到的词向量矩阵 $\mathbf{W}$（或 $\mathbf{C}$）是PMI矩阵的低秩近似，秩由嵌入维度 $N$ 控制。这一发现将词向量的经验成功与成熟的矩阵分解理论联系起来，为理解词向量的内在结构提供了理论依据。
+其中 $\mathbf{W}$ 和 $\mathbf{C}$ 分别是中心词矩阵和上下文词矩阵。令目标矩阵满足 $M_{wc} = \text{PMI}(w, c) - \log K$，则在嵌入维为 $N$ 时，SGNS 隐式寻求 $\mathbf{W}\mathbf{C}^{\top} \approx \mathbf{M}$ 的低秩分解（$\mathbf{W},\mathbf{C}$ 可取负值，故不是 NMF）。Levy和Goldberg由此证明：SGNS学习到的词向量矩阵 $\mathbf{W}$（或 $\mathbf{C}$）是 shifted PMI 矩阵的低秩近似，秩由嵌入维度 $N$ 控制。这一发现将词向量的经验成功与矩阵分解理论联系起来，为理解词向量的内在结构提供了理论依据。
 
 ### 第4.3节 层次Softmax
 
@@ -507,13 +511,13 @@ $$\min_{\mathbf{W}, \mathbf{C}} \sum_{w, c} \left( \mathbf{W}_w^{\top} \mathbf{C
 
 $$P(w \mid \mathbf{h}) = \prod_{j=1}^{l(w)-1} \sigma\left( 1(n(w, j), c) \cdot \mathbf{u}_{n(w, j)}^{\top} \mathbf{h} \right)$$
 
-该公式的含义是：沿着从根到 $w$ 的路径，在每一步根据sigmoid函数计算走正确分支的概率，并将所有步骤的概率相乘。由于 $1(n(w, j), c)$ 编码了方向信息，sigmoid的输出始终大于0.5（在正确路径上）。
+该公式的含义是：沿着从根到 $w$ 的路径，在每一步用 sigmoid 计算"按标签所指分支前进"的概率，再将路径上各步概率相乘。指示因子 $1(n(w,j),c)$ 只编码分支方向（左右），sigmoid 本身并不保证在正确路径上始终大于 $0.5$；是否"走对分支"取决于当前参数 $\mathbf{u}_n$ 与 $\mathbf{h}$ 的内积符号与大小。
 
 层次Softmax将softmax的计算复杂度从 $O(V)$ 降低到 $O(\log V)$，对于 $V = 10^5$，约从 $10^5$ 降到17——这是一个约6000倍的加速。代价是引入额外的霍夫曼树参数，且所有输出词共享梯度传播路径。
 
 ### 第4.4节 GloVe与SGNS的矩阵分解视角对比
 
-前一小节（4.2）已详述SGNS如何等价于对移位PMI矩阵的非负矩阵分解。本小节将同一视角延伸至GloVe，并对比两种方法的本质差异。
+前一小节（4.2）已详述SGNS如何等价于对移位PMI矩阵的低秩分解。本小节将同一视角延伸至GloVe，并对比两种方法的本质差异。
 
 **GloVe目标函数的矩阵分解形式。** 回顾GloVe目标函数：
 

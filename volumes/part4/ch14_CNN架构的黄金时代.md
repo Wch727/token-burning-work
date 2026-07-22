@@ -302,7 +302,7 @@ $$
 
 预激活结构使得梯度在反向传播中经过残差块时只需经过加法节点和权重矩阵，不经过任何ReLU非线性——这保证了梯度的无损传播，对于训练超过1000层的极深网络至关重要。He等人使用预激活ResNet成功训练了1001层的网络，在CIFAR-10上测试错误率约**4.62%**（Identity Mappings in Deep Residual Networks, He et al., 2016），说明极深残差网络在小数据集上仍可达到很强精度，而非退化到失败。
 
-Wide Residual Networks（WRN, Zagoruyko和Komodakis，2016）则从另一个角度拓展了残差网络：不增加深度，而是增加每层的通道数。实验表明，一个宽度为原来的k倍、深度仅为原始ResNet二分之一的网络，可以取得更优的性能——例如WRN-28-10（28层，宽度因子10）的CIFAR-10错误率（3.46%）优于原始ResNet-1101的4.92%（后者深度是其39倍）。这一发现挑战了"深度是最关键因素"的假设，表明宽度和深度之间存在可以互补的权衡。
+Wide Residual Networks（WRN, Zagoruyko和Komodakis，2016）则从另一个角度拓展了残差网络：不增加深度，而是增加每层的通道数。实验表明，一个宽度为原来的k倍、深度仅为原始ResNet二分之一的网络，可以取得更优的性能——例如WRN-28-10（28层，宽度因子10）的CIFAR-10错误率约**4.00%**，优于原始ResNet-1001的约4.92%（后者深度约为其36倍）。这一发现挑战了"深度是最关键因素"的假设，表明宽度和深度之间存在可以互补的权衡。
 
 **瓶颈结构的参数效率量化分析。** ResNet-50的瓶颈块包含三个卷积层：1×1卷积将256通道降维至64通道（参数量$256 \times 1 \times 1 \times 64 = 16,384$），3×3卷积在64通道上进行空间特征提取（参数量$64 \times 3 \times 3 \times 64 = 36,864$），1×1卷积将64通道升维回256通道（参数量$64 \times 1 \times 1 \times 256 = 16,384$）。总计每个瓶颈块约69,632个可训练参数（不含BN的γ和β）。如果不使用瓶颈结构，直接使用两个3×3卷积处理256通道（如VGG风格），每个块的参数量为$2 \times 256 \times 3 \times 3 \times 256 = 1,179,648$——瓶颈结构的参数效率是后者的约17倍。考虑到ResNet-50包含16个瓶颈块（分为4组，每组4个），这一参数节省的总量极为可观。正是这种高效的参数利用使得ResNet-50仅用约25.6M参数就达到了约22.9%的Top-1错误率（10裁剪，He等人，2016，Table 3）。
 
@@ -564,7 +564,7 @@ $$
 
 逐项计算：
 - 路径1：$\gamma \delta_i \cdot \frac{1}{s} = \frac{\gamma}{s} \delta_i$
-- 路径2：$\frac{\partial \sigma_{\mathcal{B}}^2}{\partial x_i} = \frac{2}{m}(x_i - \mu_{\mathcal{B}}) = \frac{2}{s} \hat{x}_i$，所以$\frac{\partial \mathcal{L}}{\partial \sigma_{\mathcal{B}}^2} \cdot \frac{\partial \sigma_{\mathcal{B}}^2}{\partial x_i} = -\frac{\gamma}{2s^2} \cdot \frac{\partial \mathcal{L}}{\partial \gamma} \cdot \frac{2}{s} \hat{x}_i = -\frac{\gamma}{s^2} \hat{x}_i \cdot \frac{\partial \mathcal{L}}{\partial \gamma}$
+- 路径2：$\frac{\partial \sigma_{\mathcal{B}}^2}{\partial x_i} = \frac{2}{m}(x_i - \mu_{\mathcal{B}}) = \frac{2s}{m} \hat{x}_i$，所以$\frac{\partial \mathcal{L}}{\partial \sigma_{\mathcal{B}}^2} \cdot \frac{\partial \sigma_{\mathcal{B}}^2}{\partial x_i} = -\frac{\gamma}{2s^2} \cdot \frac{\partial \mathcal{L}}{\partial \gamma} \cdot \frac{2s}{m} \hat{x}_i = -\frac{\gamma}{s m} \hat{x}_i \cdot \frac{\partial \mathcal{L}}{\partial \gamma}$
 - 路径3：$\frac{\partial \mu_{\mathcal{B}}}{\partial x_i} = \frac{1}{m}$，所以$\frac{\partial \mathcal{L}}{\partial \mu_{\mathcal{B}}} \cdot \frac{\partial \mu_{\mathcal{B}}}{\partial x_i} = -\frac{\gamma}{s} \sum_{j=1}^{m} \delta_j \cdot \frac{1}{m} = -\frac{\gamma}{ms} \sum_{j=1}^{m} \delta_j$
 
 合并三条路径：
@@ -890,9 +890,9 @@ VGG证明了"简单构件深度堆叠"的可行性，但也暴露了全连接层
 
 ### 第10.1节 学习率与批大小的协同演化
 
-黄金时代的架构创新与训练实践的演进是密不可分的。VGG的训练使用了初始学习率0.01（对应batch size 256）配合每epoch衰减的学习率调度，而GoogLeNet使用了高达0.2的初始学习率配合"每epoch衰减4%"的指数衰减策略。这些差异并非随意选择，而是与架构特性紧密相关。
+黄金时代的架构创新与训练实践的演进是密不可分的。VGG的训练使用了初始学习率0.01（对应batch size 256）配合验证误差停滞时×0.1的学习率调度，而GoogLeNet采用异步SGD，并以**每8个epoch将学习率乘以0.96**的固定指数衰减策略（与上文训练超参数表一致）。这些差异并非随意选择，而是与架构特性紧密相关。
 
-GoogLeNet之所以能够使用更大的初始学习率（0.2 vs. VGG的0.01），部分归功于Inception模块中的批归一化和辅助分类器。批归一化通过对每层输入的归一化，使得损失 landscape 更加平滑，允许使用更大的步长而不会发散。Ioffe和Szegedy在原始BN论文中报告了一个关键数据：使用BN后，VGG-style网络的训练速度提升了14倍——从13天缩短至不到1天。这一加速效果部分来自于更大的有效学习率，部分来自于减少了对手动学习率调度的依赖。
+GoogLeNet之所以能在较平滑的优化路径上稳定收敛，部分归功于Inception模块中的批归一化和辅助分类器。批归一化通过对每层输入的归一化，使得损失 landscape 更加平滑，允许使用更大的步长而不会发散。Ioffe和Szegedy在原始BN论文中报告了一个关键数据：使用BN后，VGG-style网络的训练速度提升了14倍——从13天缩短至不到1天。这一加速效果部分来自于更大的有效学习率，部分来自于减少了对手动学习率调度的依赖。
 
 ### 第10.2节 权重初始化的范式转换
 
