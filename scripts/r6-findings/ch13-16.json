@@ -1,0 +1,12 @@
+[
+  {"file":"volumes/part4/ch13_ImageNet与AlexNet.md","line":588,"fix":"改为：单模型约 17.0%（10-view）；5 模型约 16.4%；7 模型约 15.3%。","issue":"Krizhevsky et al. 2012：单 CNN（10-view）Top-5 约 17.0%；5 个相似 CNN 平均约 16.4%；7 CNN 约 15.3%。文中把 16.4% 写成单模型。","claim":"AlexNet 单模型 Top-5 错误率为 16.4%，7 模型集成进一步降到 15.3%"},
+  {"file":"volumes/part4/ch13_ImageNet与AlexNet.md","line":607,"fix":"分列单模型（约 37.5% / 17.0%）与集成（约 36.7% / 15.3%），并统一全文口径。","issue":"37.5% 是单 CNN Top-1；15.3% 是 7 模型集成 Top-5。同行混用不同设定","claim":"表13-3 同一行：AlexNet Top-1 37.5%、Top-5 15.3%"},
+  {"file":"volumes/part4/ch13_ImageNet与AlexNet.md","line":856,"fix":"改为：2015 年 11 月开源 TensorFlow（承接 DistBelief），删除错误“同年”。","issue":"“同年”锚定 2014，与 TensorFlow 2015-11 开源矛盾","claim":"2014 年谈 GoogLeNet 后写“同年……发布 DistBelief 进化版 TensorFlow（2015年11月开源）”"},
+  {"file":"volumes/part4/ch13_ImageNet与AlexNet.md","line":959,"fix":"改为 Google / DNN Research 被收购后在 Google，约 2017 年离开后含 Dessa 等；删除 FAIR。","issue":"同章第61、1286 行已明确他未于 2017 年加入 FAIR","claim":"人才流动：Alex Krizhevsky → Facebook AI Research"},
+  {"file":"volumes/part4/ch13_ImageNet与AlexNet.md","line":47,"fix":"全文统一为 XRCE。","issue":"机构正确缩写为 XRCE（Xerox Research Centre Europe）；后文 XRCI 为错误缩写","claim":"2011 年“XRCI 团队”及后文 XRCI/施乐"},
+  {"file":"volumes/part4/ch14_CNN架构的黄金时代.md","line":205,"fix":"路径2：96×1×1 → 128×3×3；路径3：16×1×1 → 32×5×5；并按此重算参数量。","issue":"GoogLeNet 原文 Inception(3a) 的 3×3 reduce 为 96（非 32）","claim":"Inception 3a：路径2 先 32 个 1×1 再 128 个 3×3"},
+  {"file":"volumes/part4/ch14_CNN架构的黄金时代.md","line":917,"fix":"改为 GoogLeNet 使用光度扭曲；PCA 颜色扰动归给 AlexNet。","issue":"PCA color jitter 是 AlexNet 技术；GoogLeNet/Inception 为 photometric distortions","claim":"GoogLeNet 使用了 PCA 颜色增强（PCA jittering）"},
+  {"file":"volumes/part4/ch15_Seq2Seq与Transformer.md","line":731,"fix":"改为“12 层 12 头的 BERT-base”；与 Transformer 6 层示例分开写。","issue":"BERT-base 为 12 层、12 头、hidden 768；6 层 8 头是原始 Transformer base","claim":"“6层12头的 BERT-base”"},
+  {"file":"volumes/part4/ch16_生成模型的演进.md","line":619,"fix":"将 t log t−(t−1) 标为 KL；JS 改为正确的 f_JS(t)。","issue":"该 f 对应 KL；JS 的生成函数为 t log t − (t+1) log((t+1)/2) 等形式","claim":"f(t)=t log t − (t−1) → JS 散度"},
+  {"file":"volumes/part4/ch16_生成模型的演进.md","line":610,"fix":"改为：原始 GAN/f-GAN 对应 f-散度；WGAN 对应 Wasserstein 度量，不在 f-散度族内。","issue":"同段第620 行已正确指出 1-Wasserstein 不属于 f-散度族","claim":"原始 GAN、f-GAN 和 WGAN 分别对应于不同的 f-散度族成员"}
+]

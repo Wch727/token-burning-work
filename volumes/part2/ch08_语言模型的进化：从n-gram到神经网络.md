@@ -237,7 +237,7 @@ $$H(P, Q) = H(P) + D_{\text{KL}}(P \parallel Q)$$
 
 $$H(\{X_t\}) = \lim_{T \to \infty} \frac{1}{T} H(X_1, X_2, \ldots, X_T) = \lim_{T \to \infty} H(X_T \mid X_1^{T-1})$$
 
-第二个等式利用了链式法则和平稳性假设。熵率衡量的是随机过程中每个随机变量的*平均不确定性*。对于语言这样的随机过程，熵率 $H(\{X_t\})$ 是语言的*内在信息密度*——它与模型无关，仅取决于语言本身的统计结构。英语的熵率估计约为每词0.6到1.3比特（取决于词表划分方式），这意味着英语中每个词携带约0.6到1.3比特的"新信息"。
+第二个等式利用了链式法则和平稳性假设。熵率衡量的是随机过程中每个随机变量的*平均不确定性*。对于语言这样的随机过程，熵率 $H(\{X_t\})$ 是语言的*内在信息密度*——它与模型无关，仅取决于语言本身的统计结构。Shannon的经典估计表明，英语的熵率约为每字符（字母级）0.6到1.3比特；若改用词级单位，则需另行给出对应的词级估计，二者不可混用。
 
 **困惑度的完整数学定义。** 给定真实分布 $P$ 和模型分布 $Q$，困惑度可以定义为熵率的指数：
 
@@ -734,9 +734,9 @@ $$\mathcal{J} = -\sum_{t=1}^{T_y} \log p(y_t \mid y_1^{t-1}, \mathbf{x})$$
 
 注意力权重 $\alpha_{tj}$ 不是显式参数化的，而是由 $\mathbf{s}_{t-1}$ 和 $\mathbf{h}_j$ 通过注意力模型隐式决定的。由于整个模型（编码器LSTM、解码器LSTM、注意力MLP）都是可微的，梯度可以通过标准的反向传播通过时间（BPTT）传播。具体而言，损失 $\mathcal{J}$ 对注意力能量 $e_{tj}$ 的梯度为：
 
-$$\frac{\partial \mathcal{J}}{\partial e_{tj}} = \sum_{t'} \frac{\partial \mathcal{J}}{\partial \alpha_{t'j}} \frac{\partial \alpha_{t'j}}{\partial e_{tj}} = \sum_{t'} \frac{\partial \mathcal{J}}{\partial \alpha_{t'j}} \alpha_{t'j} (\mathbb{I}[t'=j] - \alpha_{tj})$$
+$$\frac{\partial \mathcal{J}}{\partial e_{tj}} = \sum_{k} \frac{\partial \mathcal{J}}{\partial \alpha_{tk}} \frac{\partial \alpha_{tk}}{\partial e_{tj}} = \sum_{k} \frac{\partial \mathcal{J}}{\partial \alpha_{tk}} \alpha_{tk} (\delta_{kj} - \alpha_{tj})$$
 
-这一梯度的形式展示了softmax函数的Jacobian结构——$\partial \alpha_{t'j} / \partial e_{tj} = \alpha_{t'j} (\mathbb{I}[t'=t] - \alpha_{tj})$。
+这一梯度的形式展示了softmax函数的Jacobian结构——对固定解码步 $t$，有 $\partial \alpha_{tk} / \partial e_{tj} = \alpha_{tk} (\delta_{kj} - \alpha_{tj})$。
 
 **Bahdanau注意力的理论意义与历史地位。** Bahdanau注意力机制在概念上完成了一次根本性的转变：它将"对齐"（Alignment）从独立的后处理步骤（SMT中的Giza++字对齐）内化到了神经网络的端到端训练中。这一转变的意义超越了NMT——注意力机制是"动态路由"思想在深度学习中的首次成功应用：模型不再使用固定的计算图（如编码器最后一个隐藏状态），而是根据输入动态地选择计算路径（如源句的不同位置）。
 
@@ -849,7 +849,7 @@ METEOR使用加权调和平均，召回率权重为9，精确率权重为1——
 候选: "the cat sat on the mat"
 参考: "the cat was sitting on the mat"
 
-对齐后，匹配的词为 "the", "cat", "sat", "on", "the", "mat"（假设通过词干匹配将"sat"和"sitting"匹配）。这些匹配词在候选中形成两个chunks：$\{ \text{the cat} \}$ 和 $\{ \text{on the mat} \}$。中间插入了"sitting"（未匹配），将匹配分割为两个块。chunks越多，表示匹配越碎片化，词序质量越差。
+若采用词干匹配将候选中的"sat"与参考中的"sitting"对齐，则匹配词为 "the", "cat", "sat"/"sitting", "on", "the", "mat"（$m=6$）。参考中未匹配的是"was"，而非"sitting"。由于参考在"cat"与"sitting"之间插入了"was"，相邻性在参考侧被打断，匹配在候选中形成两个chunks：$\{ \text{the cat} \}$ 与 $\{ \text{sat on the mat} \}$。若示范中不把"sat"与"sitting"计为匹配，则二者均不得计入 $m$，亦不得再声称发生了词干对齐。chunks越多，表示匹配越碎片化，词序质量越差。
 
 碎片惩罚为：
 

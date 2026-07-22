@@ -1,0 +1,13 @@
+[
+  {"file":"volumes/part1/ch01_图灵与AI的诞生.md","line":714,"fix":"删除错误逻辑式；改为如实写LT给出*2.85比原书更短的证明，或引用正确的*2.85语句（如q⊃r .⊃: p∨q .⊃. p∨r），勿自造无效规则。","issue":"该推理并非有效命题逻辑定理，也不是Principia *2.85。","claim":"《数学原理》定理2.85表述为：从(P∨Q)→R和P→S，推出(S∨Q)→R"},
+  {"file":"volumes/part1/ch01_图灵与AI的诞生.md","line":842,"fix":"改为先Stack(B,C)（或等价的先清出并叠好底层），再Stack(A,B)。","issue":"先把A叠到B上会使B不再Clear，随后无法合法执行Stack(B,C)","claim":"积木世界先Stack(A,B)再Stack(B,C)即可达到A on B且B on C"},
+  {"file":"volumes/part1/ch01_图灵与AI的诞生.md","line":959,"fix":"改为“后被Bengio等人（2009）系统提出/命名为curriculum learning，并在深度学习中广泛使用”。","issue":"同一句把命名/再发现年代写成2020年代，却引用2009年Bengio等人论文","claim":"该策略在2020年代被重新发现并命名为课程学习（Bengio et al., 2009）"},
+  {"file":"volumes/part1/ch01_图灵与AI的诞生.md","line":1123,"fix":"时间线拆成两条：correction勘误；另列1937 JSL“Computability and λ-definability”为λ与图灵机等价。","issue":"《On Computable Numbers … A correction》(1937)是对1936文的勘误，不是λ等价证明。","claim":"1937年Turing《论可计算数……Ⅱ》的意义是“λ演算与图灵机的等价性”"},
+  {"file":"volumes/part1/ch02_感知机与连接主义的兴衰.md","line":364,"fix":"改为：盲评中MYCIN推荐治疗方案可接受率约65%，与参评医师相当（并统一全书为65%/治疗可接受性）。","issue":"经典Yu等评估量的是治疗方案可接受性约65%，不是“诊断准确率约69%”","claim":"MYCIN在受控测试中诊断准确率约69%，达人类专家水平"},
+  {"file":"volumes/part1/ch02_感知机与连接主义的兴衰.md","line":500,"fix":"删除“东京的Walter Reed…附属医院”；若保留服役叙述，仅写可核的陆军服役时段/兵种。","issue":"Walter Reed陆军医疗中心在美国华盛顿特区一带，东京不存在该机构","claim":"Rosenblatt朝鲜战争期间驻扎在日本东京的Walter Reed Army Medical Center附属医院"},
+  {"file":"volumes/part1/ch02_感知机与连接主义的兴衰.md","line":560,"fix":"将PSSH段落移回第7/8节相应位置；参考文献只放章末一次。","issue":"参考文献被插在章中，其后PSSH长文成为“参考文献后的孤儿正文”","claim":"参考文献[1]–[33]之后从第628行起继续大段PSSH正文"},
+  {"file":"volumes/part1/ch03_统计学习思想的萌芽.md","line":118,"fix":"改为可核史实人物与系统（如David Shepard的GISMO、Rabinow等），删除Noetzly/Sheffield。","issue":"早期OCR/邮编识别史中并无公认的Noetzly–Sheffield双人团队","claim":"1960年代诺伊斯（Noetzly）和谢菲尔德（Sheffield）等将统计判别用于手写邮政编码识别"},
+  {"file":"volumes/part1/ch04_第一次AI冬天与专家系统的兴衰.md","line":86,"fix":"与ch02统一为约1965年启动（可注Lederberg更早动机），避免单独写死1964为唯一起点。","issue":"同书第2章写DENDRAL为1965–1970；通史通常以1965年Stanford知识工程启动为项目起点","claim":"DENDRAL项目始于1964年"},
+  {"file":"volumes/part1/ch04_第一次AI冬天与专家系统的兴衰.md","line":102,"fix":"全书统一为爱德华·肖特利夫（Edward H. Shortliffe）。","issue":"Shortliffe通行译名是肖特利夫；“希尔特利夫”误读","claim":"爱德华·希尔特利夫（Edward H. Shortliffe）"},
+  {"file":"volumes/part1/ch04_第一次AI冬天与专家系统的兴衰.md","line":148,"fix":"改为M. Ross Quillian（罗斯·奎利安）；博士论文约1966，1968为重要发表/转载节点。","issue":"正确姓名为M. Ross Quillian；博士工作约1966","claim":"语义网络由米勒德·奎illian（Millard Quillian）于1968年在其博士论文中首次提出"}
+]

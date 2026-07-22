@@ -1,0 +1,21 @@
+[
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":81,"fix":"改为“乘积形式”或“高斯核与径向因子的乘积分解”。","issue":"后文给出的是乘积恒等式，并非“差”","claim":"Performer将softmax分解为两个核函数的差"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":233,"fix":"改为 Ā=exp(ΔA)、B̄=A^{-1}(exp(ΔA)-I)B（或等价积分形式），并标明 Δ 为步长。","issue":"标准ZOH为 Ā=exp(ΔA)、B̄=(ΔA)^{-1}(exp(ΔA)-I)ΔB；文中两项同乘 exp(Λ) 且缺少正确的 B̄ 缩放","claim":"h_t=exp(Λ(t))h_{t-1}+exp(Λ(t))B(t)x_t 为ZOH离散化"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":711,"fix":"改为点积 ∑_t v_q[t] v_d[t]（激活后非负权重）。","issue":"SPLADE 相似度为稀疏向量点积，不是逐项 min 之和","claim":"sim_SPLADE=∑ min(v_q[t],v_d[t])"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":753,"fix":"改为可核验文献（如 DSI/NCI/GENRE 等）并核对作者与年份。","issue":"该缩写/题名在文献中无法对应常见生成式检索工作","claim":"DIALOCI (BehnamGhader et al., 2023)"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":779,"fix":"改为“浓缩到1L”或示例改为“稀释到6L得1 mol/L”。","issue":"体积由2L变为1L是浓缩而非稀释","claim":"2L、3mol/L 溶液稀释到1L，最终浓度6 mol/L"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":938,"fix":"删除该条，改为 SuperGLUE 实际新增/替换任务（BoolQ、CB、COPA、MultiRC、ReCoRD、RTE、WiC、WSC 等）。","issue":"SuperGLUE 任务集不含 MNLI；392K→393K 也非真实变更","claim":"SuperGLUE增大任务规模（如MNLI-m验证集从392K扩展到393K）"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":1063,"fix":"改为“见第5节”。","issue":"本章 RAG 在第5节，不存在第6.5节","claim":"RAG框架（见6.5节）"},
+  {"file":"volumes/part6/ch21_NLP精细化.md","line":1096,"fix":"改为论文实际模型（如 PaLM 540B 或对应 PaLM-2 规模/名称）。","issue":"540B 对应的是 PaLM，不是 PaLM-2","claim":"对比解码在 PaLM-2 540B 上将 FActScore 从约28提升至35"},
+  {"file":"volumes/part6/ch22_计算机视觉精细化.md","line":758,"fix":"按官方实现改为约3.6×10^8 参数量级，并删去错误占比。","issue":"标准 ControlNet（SD1.5）可训练副本约为编码器量级（约数亿参数，常见约361M量级），远高于13M","claim":"ControlNet可训练参数约13M，约占SD UNet 9%"},
+  {"file":"volumes/part6/ch22_计算机视觉精细化.md","line":513,"fix":"改为：默认 ByteTrack（无Re-ID）约80.3 MOTA/77.3 IDF1；删除“引入Re-ID后才到80.3”的表述。","issue":"ByteTrack 主结果即以 YOLOX+IoU（无需Re-ID）在 MOT17 上约80.3 MOTA","claim":"ByteTrack无Re-ID达61.3 MOTA，引入Re-ID后达80.3 MOTA"},
+  {"file":"volumes/part6/ch23_图神经网络与结构数据.md","line":434,"fix":"统一改为正确方向，如（巴黎，located_in，法国）。","issue":"语义方向错误：应为（巴黎，位于，法国）","claim":"三元组（法国，位于，巴黎）等表示一对多关系“位于”"},
+  {"file":"volumes/part6/ch23_图神经网络与结构数据.md","line":451,"fix":"改用正确1-to-N几何说明（不同头/相位配置，或说明 RotatE 对1-to-N仍有限制、需与 ComplEx 等对比）。","issue":"同一 h 与同一 r 的 Hadamard 积唯一，会强制 t_巴黎≈t_里昂","claim":"RotatE下 t_巴黎≈h_法国⊙r 且 t_里昂≈h_法国⊙r，仍可区分多尾实体"},
+  {"file":"volumes/part6/ch23_图神经网络与结构数据.md","line":496,"fix":"改为 1,345 个关系。","issue":"FB15k 标准统计为 1,345 个关系","claim":"FB15k包含134个关系"},
+  {"file":"volumes/part6/ch23_图神经网络与结构数据.md","line":340,"fix":"补全 column-wise attention + transition(FFN) 的标准结构描述。","issue":"AlphaFold2 Evoformer 在 MSA 上还有 column-wise attention","claim":"Evoformer其次执行列-wise前馈网络"},
+  {"file":"volumes/part6/ch24_AI安全对齐与伦理.md","line":355,"fix":"删除“被称为Hellinger距离”，改为说明 D₂ 与 χ² 的关系。","issue":"Hellinger距离与 Bhattacharyya 系数相关；D₂ 与 χ² 散度相关，二者不等同","claim":"α=2时的Rényi散度被称为Hellinger距离"},
+  {"file":"volumes/part6/ch24_AI安全对齐与伦理.md","line":363,"fix":"改为 Mironov 常用界：ε_DP=ε_RDP+log(1/δ)/(α-1)。","issue":"标准转换约为 (ε+log(1/δ)/(α-1),δ)-DP；文中重复计入 log(1/δ) 并夹带错误项","claim":"RDP→DP 转换为 (ε(α)+[log(α-1)-αlogα+log(1/δ)]/(α-1),δ)-DP 且 ε(α)=ε+log(1/δ)/(α-1)"},
+  {"file":"volumes/part6/ch24_AI安全对齐与伦理.md","line":435,"fix":"改为最终约 ε=19.61，并注明若引用中间方案需标注版本。","issue":"最终 DAS 全局隐私损失约为 ε≈19.61","claim":"2020美国人口普查目标隐私预算 ε=13.17"},
+  {"file":"volumes/part6/ch24_AI安全对齐与伦理.md","line":538,"fix":"改为“在第6.3节中”或删除错误交叉引用。","issue":"本章不存在第6.6.3节；IBP 在第6.3节附近已述","claim":"在第6.6.3节中，我们简要介绍了IBP"},
+  {"file":"volumes/part6/ch24_AI安全对齐与伦理.md","line":576,"fix":"改为“提案/未通过最终编号”或引用正确生效法规编号与状态。","issue":"AI Liability Directive 未以 2024/2859 通过","claim":"《AI责任指令》Directive (EU) 2024/2859"}
+]

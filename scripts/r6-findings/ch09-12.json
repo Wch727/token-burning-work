@@ -1,0 +1,18 @@
+[
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":141,"fix":"改为：给定可见层时对隐藏层可解析求和（free energy 可算）；配分函数 Z 仍不可行，需 CD/PCD 等近似。","issue":"RBM 仅对隐藏层求和可解析；配分函数 Z 仍需对全部可见构型求和","claim":"由于可见层和隐藏层内部均无连接，配分函数可以解析地计算"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":402,"fix":"改为：涉及对模型全部构型（或高维状态空间）的求和。","issue":"Z 是对模型全部状态/构型的求和，不是对训练数据点的求和","claim":"对配分函数 Z 求导……涉及对所有数据点的求和"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":469,"fix":"改为：顶部为无向 RBM（associative memory）；下层为有向 top-down 生成连接。","issue":"Sigmoid Belief Network 是有向模型；DBN 顶层是无向 RBM","claim":"顶部可能包含一个无向连接层（sigmoid Belief Network的变体）"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":483,"fix":"改为：顶部两层构成无向 RBM/associative memory；其下为有向条件因子。","issue":"该联合因子对应无向 RBM，不是 SBN","claim":"最后一个因子 p(h^(L-1), h^(L)) 是……完全连接的 sigmoid Belief Network 层"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":559,"fix":"改为：DBN 顶部两层为无向 RBM；其下各层为有向 top-down 连接。DBM 则层间全无向。","issue":"与标准 DBN 及本章公式相反","claim":"DBN……顶层则是有向的sigmoid信念网络"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":886,"fix":"改为：顶部两层为无向 RBM；其下为有向 top-down 生成连接。","issue":"顶部两层应是无向 RBM","claim":"相邻两层通过无向连接（RBM），而顶部两层通过有向连接（SBN）结合"},
+  {"file":"volumes/part3/ch09_深度信念网络与预训练的革命.md","line":910,"fix":"分别写 wake 阶段更新生成权重、sleep 阶段更新识别权重的正确规则，或删去错误公式。","issue":"该式不是标准 wake-sleep 规则","claim":"权重更新使用 Hebbian 规则：Δw ∝ ⟨data⟩ · ⟨reconstruction⟩"},
+  {"file":"volumes/part3/ch10_GPU计算与大数据.md","line":452,"fix":"改为：每卡约 24GB GDDR5（两颗 GK210 各约 12GB）。","issue":"Tesla K80 总显存为 24GB","claim":"每块 K80 含 2 个 GK210，合计约 12GB GDDR5 显存/卡"},
+  {"file":"volumes/part3/ch10_GPU计算与大数据.md","line":519,"fix":"改为：云端训练总成本估计约数百万美元量级（含算力租用等），勿写“总电费”。","issue":"常见 $4.6M 量级引用是云端训练总计算成本估算，不是单纯电费","claim":"GPT-3……总电费估计超过 $4.6 million"},
+  {"file":"volumes/part3/ch10_GPU计算与大数据.md","line":521,"fix":"改为：Adam 通常为每个参数额外存 2 个 FP32 矩（外加 FP32 主权重副本等）。","issue":"标准 Adam 一阶/二阶矩通常以 FP32 存储","claim":"Adam 的动量和方差，每个参数需要额外 2 个 FP16 值存储"},
+  {"file":"volumes/part3/ch10_GPU计算与大数据.md","line":604,"fix":"改为：NVLink 3.0/4.0 单卡双向总带宽约 600/900 GB/s（经多链路/NVSwitch 聚合），勿写 per pair。","issue":"600/900 GB/s 是单 GPU 双向总带宽量级，不是任意 GPU pair 带宽","claim":"NVLink 3.0 为 600 GB/s per pair，NVLink 4.0 为 900 GB/s per pair"},
+  {"file":"volumes/part3/ch11_深度学习的关键理论突破.md","line":364,"fix":"删除该式，改引 Montúfar et al. 2014 的正确下界表述（按层宽/深度组合计数）。","issue":"公式无意义/错误","claim":"网络大约有 (p^l · n)^l 个不同的线性区域（Montufar 等人）"},
+  {"file":"volumes/part3/ch11_深度学习的关键理论突破.md","line":685,"fix":"区分：2012 预印本 1207.0580 用正确标题 Improving neural networks by preventing co-adaptation of feature detectors；JMLR 2014 再用 “Dropout: A Simple Way…”。","issue":"1207.0580 标题不是 “simple way…”","claim":"arXiv:1207.0580 \"Dropout: A simple way to prevent neural networks from overfitting\""},
+  {"file":"volumes/part3/ch12_计算机视觉的演进.md","line":741,"fix":"删除/改正为：LeNet-5 用 RBF 输出与对应距离损失；softmax+CE 是后世标准，非 LeNet-5 原文设定。","issue":"同章已写 LeNet-5 输出为 RBF 欧氏距离","claim":"LeCun 使用交叉熵损失……输出层使用 softmax……"},
+  {"file":"volumes/part3/ch12_计算机视觉的演进.md","line":804,"fix":"改为：LeNet-5 使用 RBF 输出；softmax+交叉熵成为后世主流分类配置。","issue":"与 LeNet-5 原文（RBF 输出）不符","claim":"LeNet 确立了……交叉熵损失和 softmax 输出的标准组合"},
+  {"file":"volumes/part3/ch12_计算机视觉的演进.md","line":790,"fix":"删除该句，或改为引用 Chellapilla et al. 2006 / 后续 GPU 加速 CNN 工作。","issue":"不存在该 2003 LeCun+Bengio GPU 论文","claim":"2003年，他与Bengio合作发表了关于图形处理器的神经网络训练的早期工作"}
+]

@@ -1,0 +1,14 @@
+[
+  {"file":"volumes/part2/ch05_统计机器学习的基础奠定.md","line":107,"fix":"改为：当 d 固定且 N→∞ 时置信项为 O(√(d/N))；当 d 随 N 增长至 Θ(N) 时界退化为 O(1)，不再给出有用的一致收敛速率。","issue":"将 d≈N 代入得 O(1) 量级，不会退化为 O(√(ln N/N))","claim":"当 d∼N 或 d>N 时，VC 置信项退化为 O(√(ln N/N))"},
+  {"file":"volumes/part2/ch05_统计机器学习的基础奠定.md","line":1144,"fix":"写作 = 1/2 − (3/2)γ + 2γ³ = 1/2 − γ′，其中 γ′ = (3/2)γ − 2γ³（对足够小的 γ>0 有 γ′>0）。","issue":"代数展开错误：常数项是 1/2 而非 3/8，线性项系数是 −3/2 而非 −3/4","claim":"3(1/2−γ)²(1/2+γ)+(1/2−γ)³ = 3/8 − (3/4)γ + O(γ²)，且 γ′=(3/4)γ−2γ³"},
+  {"file":"volumes/part2/ch05_统计机器学习的基础奠定.md","line":502,"fix":"先保存 b_old←b、α 旧值，再更新 b，然后用 (b−b_old) 与 Δα 更新全部 f_k。","issue":"第 499–501 行已把 b 覆盖为新偏置，第 502 行再写 (b^{new}−b) 使偏置修正项恒为 0","claim":"SMO 中 f_k ← f_k + … + (b^{new}−b)，随后 α 更新"},
+  {"file":"volumes/part2/ch05_统计机器学习的基础奠定.md","line":1793,"fix":"核矩阵写 G̃=K_{N,m} U_r Λ_r^{−1} U_r^⊤ K_{m,N}；若需显式特征则另写 Z=K_{N,m} U_r Λ_r^{−1/2}。","issue":"标准核矩阵低秩近似用 Λ^{−1}，Λ^{−1/2} 只用于构造特征映射","claim":"Nystrom 近似 G̃ = K_{N,m} U_r Λ_r^{−1/2} U_r^⊤ K_{m,N}"},
+  {"file":"volumes/part2/ch05_统计机器学习的基础奠定.md","line":1880,"fix":"η_k ← (∂R̂_N(α)/∂K_k) / ∑_{k′}(∂R̂_N(α)/∂K_{k′})（或按 SimpleMKL 的投影次梯度规则书写）。","issue":"公式括号错乱，缺少除号","claim":"η_k ← (∂R̂_N/∂K_k){∑_{k′} ∂R̂_N/∂K_{k′}}"},
+  {"file":"volumes/part2/ch06_概率图模型与贝叶斯革命.md","line":388,"fix":"统一约定：要么 ψ_C=exp(−E_C) 且 E=∑E_C，要么写 E=−∑_C log ψ_C(x_C)。","issue":"与上文 Gibbs 形式 p∝∏ψ_C 不一致","claim":"E(x)=−∑_C ψ_C(x_C) 且 p(x)=(1/Z)exp{−E(x)}"},
+  {"file":"volumes/part2/ch06_概率图模型与贝叶斯革命.md","line":559,"fix":"φ_{nk} ∝ exp(E_q[log θ_k] + E_q[log β_{k,w_n}])，并与全局变分参数 λ/β 的更新区分开。","issue":"同一符号 φ 既作变分主题分配又作主题-词分布","claim":"φ_{nk} ∝ exp(E[log θ_k] + E[log φ_{k,w_n}])"},
+  {"file":"volumes/part2/ch07_神经网络的下沉期.md","line":223,"fix":"写明 S2/S4 为带可学习系数与偏置的 2×2 平均池化（每图 2 个参数），再给出参数量。","issue":"原版 LeNet-5 每个池化特征图有可训练的系数与偏置","claim":"LeNet-5 的 S2 平均池化层不学习参数"},
+  {"file":"volumes/part2/ch07_神经网络的下沉期.md","line":235,"fix":"按原论文逐层重算（含 S2/S4），输出层改为 10×84=840，总参数与分项一致。","issue":"分项相加≠61,706；RBF 输出层标准为 10×84=840","claim":"总参数 61,706；输出层 2,850"},
+  {"file":"volumes/part2/ch08_语言模型的进化：从n-gram到神经网络.md","line":240,"fix":"改为“约 0.6–1.3 bits/character（字符/字母级）”，若谈词级则给出对应词级估计。","issue":"Shannon 经典估计约 0.6–1.3 bits/character，不是每词","claim":"英语熵率约为每词 0.6 到 1.3 比特"},
+  {"file":"volumes/part2/ch08_语言模型的进化：从n-gram到神经网络.md","line":737,"fix":"写 ∂J/∂e_{tj}=∑_k (∂J/∂α_{tk}) α_{tk}(δ_{kj}−α_{tj})。","issue":"softmax 雅可比 t′ 与 j 混用","claim":"∂J/∂e_{tj}=∑_{t′} (∂J/∂α_{t′j}) α_{t′j}(I[t′=j]−α_{tj})"},
+  {"file":"volumes/part2/ch08_语言模型的进化：从n-gram到神经网络.md","line":852,"fix":"若采用词干匹配则 sitting↔sat 计入 m，并据此重画 chunks；若示范未匹配插入，则不要声称 stem 对齐。","issue":"同一词不能既被算作匹配又被算作未匹配插入","claim":"词干匹配将 sat 与 sitting 对齐，同时又说中间插入了 sitting（未匹配）"}
+]

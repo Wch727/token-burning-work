@@ -711,9 +711,9 @@ FUNCTION LogicTheoristComplete(target, axioms, rules, heuristic):
     RETURN Search(target, 0, NULL)
 ```
 
-**LT证明定理2.85的详细工作过程**：《数学原理》中的定理2.85是命题逻辑中的一条中间定理，用于证明更复杂的结果。其表述形式为：从$(P \lor Q) \to R$和$P \to S$，推出$(S \lor Q) \to R$。LT的证明过程是逐步构建证明树的搜索过程。LT首先尝试将目标$(S \lor Q) \to R$转化为蕴含式的前件为真时后件必真的形式。通过启发式引导，LT优先选择了"分配律"规则将目标变形，然后依次搜索$S$和$Q$的子证明。经过约12步推理链，LT找到了完整证明——值得注意的是，该证明比怀特海和罗素在Principia中给出的原始证明短了2步。当LT在JOHNNIAC的打印机上输出这行证明时，房间里的反应被西蒙描述为"一次安静的震撼——不是欢呼，而是对即将到来的某种新事物的沉默确认。"
+**LT证明定理\*2.85的详细工作过程**：《数学原理》中的定理\*2.85是命题逻辑中的一条中间定理，其正确表述为：$q \supset r \;.\;\supset\;:\; p \lor q \;.\;\supset\;.\; p \lor r$，即由$q \to r$可推出$(p \lor q) \to (p \lor r)$。LT的证明过程是逐步构建证明树的搜索过程：它从目标公式出发，在可用公理与推理规则中进行启发式搜索，优先尝试能够缩短目标与公理之间差异的变形。经过约12步推理链，LT找到了完整证明——值得注意的是，该证明比怀特海和罗素在Principia中给出的原始证明更短。当LT在JOHNNIAC的打印机上输出这行证明时，房间里的反应被西蒙描述为"一次安静的震撼——不是欢呼，而是对即将到来的某种新事物的沉默确认。"
 
-LT在证明定理2.85时发现了一个比《数学原理》原证明更简洁的证明，这一成果在《数学原理》作者罗素那里引起了强烈反响——据西蒙回忆，当罗素看到LT的证明时，他"激动得满脸通红"。
+LT在证明定理\*2.85时发现了一个比《数学原理》原证明更简洁的证明，这一成果在《数学原理》作者罗素那里引起了强烈反响——据西蒙回忆，当罗素看到LT的证明时，他"激动得满脸通红"。
 
 
 ### 第6.2节 GPS：通用问题求解器
@@ -839,7 +839,7 @@ FUNCTION GPS_Members(initial_state, goal_state, diff_table, operators):
 
 **GPS与LT的本质区别**：LT使用纯前向链推理——从公理出发，逐步推导出目标。GPS使用反向链推理（backward chaining）结合手段-目的分析——从目标出发，反向搜索满足目标所需的前置条件。这一区别反映了LT（定理证明）与GPS（问题求解）的不同任务结构：LT的任务结构是"目标明确、搜索空间规则"，而GPS的任务结构是"目标明确、但需要分解为多层次的子目标"。
 
-积木世界实例：假设初始状态为{A on Table, B on Table, C on Table, Clear A, Clear B, Clear C}，目标状态为{A on B, B on C, C on Table, Clear A}。GPS的求解过程为：（1）识别主要差异：A应放在B上而非Table上；（2）选择操作：Stack(A,B)的前置条件是Clear A（已满足）和Clear B（已满足）；（3）应用操作；（4）识别下一差异：B应放在C上；（5）选择操作：Stack(B,C)；（6）完成目标。
+积木世界实例：假设初始状态为{A on Table, B on Table, C on Table, Clear A, Clear B, Clear C}，目标状态为{A on B, B on C, C on Table, Clear A}。若先执行Stack(A,B)，则B不再Clear，随后无法合法执行Stack(B,C)。正确顺序应先叠好底层：GPS的求解过程为：（1）识别主要差异：B应放在C上而非Table上；（2）选择操作：Stack(B,C)的前置条件是Clear B（已满足）和Clear C（已满足）；（3）应用操作，得到B on C且Clear B仍成立（A尚未叠上）；（4）识别下一差异：A应放在B上；（5）选择操作：Stack(A,B)（此时Clear A与Clear B均满足）；（6）完成目标。
 
 ### 第6.3节 Samuel跳棋程序：机器学习的先驱
 
@@ -956,7 +956,7 @@ FUNCTION SAMPLE_PERTURBATION(weights, magnitude):
 END FUNCTION
 ```
 
-**课程学习（Curriculum Learning）策略**：塞缪尔在后期版本中引入了难度递增的训练方案。程序首先在"简化棋盘"（7×7而非8×8）上自我对弈，积累基础策略；然后在标准棋盘上与较弱版本的自身对弈；最后逐步提升难度至与最强版本对弈。这一策略在2020年代被重新发现并命名为"课程学习"（Bengio et al., 2009），是深度学习中的标准训练技术。
+**课程学习（Curriculum Learning）策略**：塞缪尔在后期版本中引入了难度递增的训练方案。程序首先在"简化棋盘"（7×7而非8×8）上自我对弈，积累基础策略；然后在标准棋盘上与较弱版本的自身对弈；最后逐步提升难度至与最强版本对弈。这一策略后被Bengio等人（2009）系统提出并命名为"课程学习"（curriculum learning），并在深度学习中广泛使用，成为标准训练技术之一。
 
 **Samuel跳棋程序的里程碑时刻**：1959年，塞缪尔发表跳棋程序与机器学习的重要论文，程序在IBM 701等平台上已趋成熟；**1962年**，程序战胜康涅狄格州优秀棋手Robert Nealey。二者应分开叙述，不宜把胜局年份记为1959。
 
@@ -1120,7 +1120,8 @@ Lighthill报告（Lighthill, 1973）对AI研究持高度批评态度，特别指
 | 1935–1936 | 图灵机概念的形成 | Alan Turing | 可计算性的形式化模型 |
 | 1936 | 《论可计算数……》发表 | Turing | 图灵机、Church-Turing论题、停机问题 |
 | 1936 | Church-Turing论题提出 | Church & Turing | 可计算性模型的等价性 |
-| 1937 | Turing《论可计算数……Ⅱ》 | Turing | λ演算与图灵机的等价性 |
+| 1937 | Turing《论可计算数……A correction》 | Turing | 对1936年论文的勘误与澄清 |
+| 1937 | Turing《Computability and λ-definability》（JSL） | Turing | λ演算与图灵机可计算性的等价性 |
 | 1943 | McCulloch-Pitts神经元 | McCulloch & Pitts | 人工神经网络的数学基础 |
 | 1945 | von Neumann架构报告 | von Neumann | 存储程序计算机设计 |
 | 1948 | 《控制论》出版 | Norbert Wiener | 反馈、通信与控制的数学理论 |
