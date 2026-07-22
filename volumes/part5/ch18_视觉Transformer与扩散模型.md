@@ -201,7 +201,7 @@ $$
 \hat{y} = \frac{1}{2} \left( \text{Softmax}(\mathbf{z}_L^{[cls]}\mathbf{W}_{\text{head}}) + \text{Softmax}(\mathbf{z}_L^{[distill]}\mathbf{W}_{\text{head}}) \right)
 $$
 
-实验结果表明，这种设计使DeiT-B在ImageNet上达到了83.4%的top-1准确率，与使用大量增强和训练技巧的CNN模型（如ResNet-50）相当，而参数量仅为ResNet-50的约1/3。更重要的是，DeiT的收敛速度显著快于ViT——通常只需原来1/3到1/2的训练步数即可达到相同的性能。
+实验结果表明，这种设计使DeiT-B在ImageNet上达到了83.4%的top-1准确率，与使用大量增强和训练技巧的CNN模型相当；相对ResNet-50（约25M参数），DeiT-B（约86M参数）的参数量约为其3倍，而更轻量的DeiT-S则与ResNet-50参数量同量级。更重要的是，DeiT的收敛速度显著快于ViT——通常只需原来1/3到1/2的训练步数即可达到相同的性能。
 
 ---
 
@@ -413,13 +413,13 @@ $$
 
 这一简化损失是后续所有扩散模型工作的标准训练目标。
 
-**改进的DDPM（Improved DDPM）：** Nichol & Dhariwal（2021）在原始DDPM的基础上提出了两项关键改进。第一，**学习方差（Learned Variance）**：原始DDPM将反向过程的方差固定为 $\sigma_t^2 = \tilde{\beta}_t$，而Improved DDPM让网络同时预测噪声 $\boldsymbol{\epsilon}_\theta$ 和方差参数。具体地，网络被要求输出一个向量 $\mathbf{v}_\theta(\mathbf{x}_t, t) \in \mathbb{R}^3$，然后通过以下 softmax 变换将其映射为三个潜在方差选择的混合权重：
+**改进的DDPM（Improved DDPM）：** Nichol & Dhariwal（2021）在原始DDPM的基础上提出了两项关键改进。第一，**学习方差（Learned Variance）**：原始DDPM将反向过程的方差固定为 $\sigma_t^2 = \tilde{\beta}_t$，而Improved DDPM让网络同时预测噪声 $\boldsymbol{\epsilon}_\theta$ 和方差插值参数。具体地，网络输出一个与图像同形状的插值系数 $v_\theta(\mathbf{x}_t, t) \in [0,1]$（通常经 sigmoid 约束），并在对数空间中对上界 $\beta_t$ 与后验方差 $\tilde{\beta}_t$ 做插值：
 
 $$
-\text{softmax}(\mathbf{v}_\theta(\mathbf{x}_t, t)) = (w_\ell, w_f, w_h) \in \Delta^2
+\Sigma_\theta(\mathbf{x}_t, t) = \exp\!\big( v_\theta(\mathbf{x}_t, t)\,\log \beta_t + \big(1 - v_\theta(\mathbf{x}_t, t)\big)\,\log \tilde{\beta}_t \big)
 $$
 
-其中 $w_\ell, w_f, w_h$ 分别对应三种方差选择：$\beta_t$（线性插值）、$\tilde{\beta}_t$（后验方差）和 $\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \beta_t$（DDIM相关方差）。最终的方差为三种选择的加权平均。混合权重的预测通过以下损失项进行端到端训练——在ELBO中，方差相关的项不再被忽略，而是完整地参与梯度计算。实验表明，学习方差在CIFAR10上将FID从3.75进一步降低到2.92，在CelebA-HQ 256×256上从5.83降低到3.94，提升幅度虽然不及噪声预测架构改进（如U-Net设计、注意力机制），但在高质量图像生成中提供了额外的边际收益。
+其中 $\tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}\beta_t$。该参数化保证方差始终落在 $[\tilde{\beta}_t, \beta_t]$ 区间内，并在ELBO中让方差相关项完整参与梯度计算。实验表明，学习方差在CIFAR10上将FID从3.75进一步降低到2.92，在CelebA-HQ 256×256上从5.83降低到3.94，提升幅度虽然不及噪声预测架构改进（如U-Net设计、注意力机制），但在高质量图像生成中提供了额外的边际收益。
 
 第二，**余弦方差调度（Cosine Variance Schedule）：** Improved DDPM将方差调度从线性调度改为余弦调度：
 
@@ -505,7 +505,7 @@ $$
 \mathbf{x}_{k+1} = \mathbf{x}_k + \frac{\epsilon}{2} \nabla_{\mathbf{x}} \log p(\mathbf{x}_k) + \sqrt{\epsilon} \mathbf{z}_k, \quad \mathbf{z}_k \sim \mathcal{N}(\mathbf{0}, \mathbf{I})
 $$
 
-其中 $\epsilon$ 为步长。当 $\epsilon \to 0$ 且 $K \to \infty$ 时，$\mathbf{x}_K$ 的分布收敛到 $p(\mathbf{x})$（依据Laudau理论）。
+其中 $\epsilon$ 为步长。当 $\epsilon \to 0$ 且 $K \to \infty$ 时，$\mathbf{x}_K$ 的分布收敛到 $p(\mathbf{x})$（依据Langevin动力学与Fokker–Planck方程的经典结果）。
 
 然而，直接估计 $\nabla_{\mathbf{x}} \log p(\mathbf{x})$ 面临一个根本困难：我们无法直接计算 $p(\mathbf{x})$（它涉及对整个数据分布的归一化常数积分）。Denoising Score Matching（Vincent, 2011）通过引入一个受控的噪声过程绕过了这一问题：对数据样本 $\mathbf{x} \sim p(\mathbf{x})$ 添加噪声得到 $\mathbf{x}' = \mathbf{x} + \boldsymbol{\epsilon}$（$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \sigma^2 \mathbf{I})$），然后估计加噪分布 $p(\mathbf{x}')$ 的得分函数。关键定理表明：
 
@@ -533,7 +533,7 @@ $$
 
 其中 $\bar{\mathbf{w}}$ 为反向时间的Wiener过程。注意反向SDE的漂移项中包含了得分函数 $\nabla_{\mathbf{x}} \log q(\mathbf{x})$——这正是我们需要学习的量。如果能够训练一个网络 $s_\theta(\mathbf{x}_t, t) \approx \nabla_{\mathbf{x}_t} \log q(\mathbf{x}_t)$，就可以通过数值方法（如Euler-Maruyama离散化）从纯噪声出发，沿反向SDE逐步去噪，最终采样得到数据样本。
 
-**DDPM与SDE的统一视角：** DDPM的反向过程（式6-43）可以看作是上述反向SDE的概率ODE（Probability ODE）版本——当对反向SDE应用Tweedie公式并选择特定的离散化方案时，得到的结果与DDPM采样公式一致。反过来，DDIM（Song et al., 2021）可以被理解为对反向SDE的确定性离散化（忽略随机项 $g(t) \, d\bar{\mathbf{w}}$），这正是DDIM实现确定性采样的数学根源。
+**DDPM与SDE的统一视角：** DDPM的反向过程（见上文采样公式 $\mathbf{x}_{t-1} = \frac{1}{\sqrt{1 - \beta_t}}\big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}}\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\big) + \sigma_t \mathbf{z}_t$）可以看作是上述反向SDE的概率ODE（Probability ODE）版本——当对反向SDE应用Tweedie公式并选择特定的离散化方案时，得到的结果与DDPM采样公式一致。反过来，DDIM（Song et al., 2021）可以被理解为对反向SDE的确定性离散化（忽略随机项 $g(t) \, d\bar{\mathbf{w}}$），这正是DDIM实现确定性采样的数学根源。
 
 从SDE视角出发，研究者们提出了多种改进扩散模型的方法。**Variance Exploding（VE）**和**Variance Preserving（VP）**是两种经典的SDE参数化（Song et al., 2021）：VP SDE通过设计使整个扩散过程中数据的方差保持为1（仅改变其分布形状），VE SDE则让方差随时间指数增长。**edict（Editable Diffusion, Meng et al., 2021）**利用反向SDE的可逆性实现了图像编辑。**一致性模型（Consistency Model, Song et al., 2023）**直接在反向SDE的轨迹上学习一个将任意噪声级别映射到数据分布的映射，实现了单步生成。这些进展表明，SDE框架不仅是一个优美的数学等价描述，更是一个催生新方法论的活性研究前沿。
 

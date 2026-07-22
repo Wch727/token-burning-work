@@ -1,0 +1,72 @@
+{
+  "round": 1,
+  "groups": {
+    "ch01-04": [
+      {"file": "volumes/part1/ch03_统计学习思想的萌芽.md", "line": 58, "severity": "high", "category": "fact", "claim": "这一技术路线与1980年代发展起来的变分自编码器一脉相承", "issue": "VAE 2013/2014，非1980年代", "fix": "改为与2010年代提出的变分自编码器（Kingma & Welling, 2013/2014）及更早的变分推断传统一脉相承"},
+      {"file": "volumes/part1/ch01_图灵与AI的诞生.md", "line": 504, "severity": "high", "category": "fact", "claim": "马文·明斯基……当时是哈佛大学的博士生", "issue": "1956达特茅斯时他是哈佛Junior Fellow，1954已获Princeton博士", "fix": "改为当时在哈佛大学任Junior Fellow"},
+      {"file": "volumes/part1/ch01_图灵与AI的诞生.md", "line": 541, "severity": "high", "category": "fact", "claim": "神经网络理论（Minsky & Edmonds, 1967）", "issue": "SNARC约1951", "fix": "改为（Minsky & Edmonds, 约1951）或SNARC神经网络模拟器（约1951）"},
+      {"file": "volumes/part1/ch04_第一次AI冬天与专家系统的兴衰.md", "line": 74, "severity": "high", "category": "fact", "claim": "反向传播算法还要再等14年才能由鲁梅尔哈特重新发现", "issue": "1969+14=1983，实际1986约17年", "fix": "改为再等约17年（1986年）才由Rumelhart等人系统推广"},
+      {"file": "volumes/part1/ch02_感知机与连接主义的兴衰.md", "line": 15, "severity": "high", "category": "structure", "claim": "定理6.1/6.2/6.3/6.4", "issue": "第2章却用定理6.x", "fix": "统一改为定理2.1、2.2、2.3、2.4"},
+      {"file": "volumes/part1/ch02_感知机与连接主义的兴衰.md", "line": 163, "severity": "high", "category": "contradiction", "claim": "容量d+1又说约2d", "issue": "VC维与Cover函数混为一谈", "fix": "区分：VC维d+1；Cover函数N≈2(d+1)时可分概率约1/2"},
+      {"file": "volumes/part1/ch03_统计学习思想的萌芽.md", "line": 52, "severity": "high", "category": "incomplete", "claim": "引入了“确定性因子”作为一种替代贝叶斯概率的。", "issue": "句子截断", "fix": "补全为作为一种替代贝叶斯概率的不确定性度量/近似机制"},
+      {"file": "volumes/part1/ch03_统计学习思想的萌芽.md", "line": 180, "severity": "high", "category": "fact", "claim": "1960年代，明斯基在其博士论文中提出的SNARC", "issue": "SNARC约1951，博士1954", "fix": "改为1950年代初（约1951年），明斯基在博士研究中建造的SNARC"},
+      {"file": "volumes/part1/ch03_统计学习思想的萌芽.md", "line": 102, "severity": "high", "category": "fact", "claim": "Friedman、Stigler和Welch 1951最近邻", "issue": "应为Fix & Hodges 1951/1952", "fix": "改为Fix and Hodges（1951, 1952）以及Cover and Hart（1967）"},
+      {"file": "volumes/part1/ch01_图灵与AI的诞生.md", "line": 601, "severity": "high", "category": "fact", "claim": "6月22日：皮尔斯做了关于几何定理机器证明的报告", "issue": "10人名单无皮尔斯", "fix": "删除或改写为有据的参会者发言"},
+      {"file": "volumes/part1/ch04_第一次AI冬天与专家系统的兴衰.md", "line": 221, "severity": "medium", "category": "structure", "claim": "第四次，技术的周期性", "issue": "编号断裂", "fix": "改为“第四，……”"},
+      {"file": "volumes/part1/ch01_图灵与AI的诞生.md", "line": 463, "severity": "medium", "category": "structure", "claim": "十种/九类/五种误解混乱", "issue": "计数与层级混乱", "fix": "统一为图灵原文九类反对意见，修正小节标题"}
+    ],
+    "ch05-08": [
+      {"file": "volumes/part2/ch05_统计机器学习的基础奠定.md", "line": 65, "severity": "high", "category": "fact", "claim": "决策树桩VCdim=d", "issue": "不正确，约O(log d)", "fix": "改正VC维结论并与定义一致"},
+      {"file": "volumes/part2/ch05_统计机器学习的基础奠定.md", "line": 500, "severity": "high", "category": "latex", "claim": "SMO f_k用y_k", "issue": "应用y_i y_j", "fix": "f_k ← f_k + y_i(...)+ y_j(...)"},
+      {"file": "volumes/part2/ch05_统计机器学习的基础奠定.md", "line": 893, "severity": "high", "category": "fact", "claim": "IIS由Darroch & Ratcliff 1972", "issue": "那是GIS；IIS是Della Pietra 1997", "fix": "分开GIS与IIS归属"},
+      {"file": "volumes/part2/ch05_统计机器学习的基础奠定.md", "line": 1209, "severity": "high", "category": "structure", "claim": "6.6后直接6.8", "issue": "缺6.7", "fix": "6.8改为6.7"},
+      {"file": "volumes/part2/ch06_概率图模型与贝叶斯革命.md", "line": 330, "severity": "high", "category": "incomplete", "claim": "RTS平滑则对应于双向的信念传播则对应于双向的信念传播", "issue": "重复残句", "fix": "删重复"},
+      {"file": "volumes/part2/ch06_概率图模型与贝叶斯革命.md", "line": 432, "severity": "high", "category": "contradiction", "claim": "MEMM写成全局归一化又说局部", "issue": "自相矛盾", "fix": "MEMM改为逐步局部归一化"},
+      {"file": "volumes/part2/ch07_神经网络的下沉期.md", "line": 497, "severity": "high", "category": "fact", "claim": "1990年代中期DNNresearch", "issue": "DNNresearch 2012/2013", "fix": "移到2012-2013"},
+      {"file": "volumes/part2/ch07_神经网络的下沉期.md", "line": 547, "severity": "high", "category": "fact", "claim": "AlexNet一块GTX 580", "issue": "两块", "fix": "改为两块"},
+      {"file": "volumes/part2/ch08_语言模型的进化：从n-gram到神经网络.md", "line": 306, "severity": "high", "category": "fact", "claim": "Brown聚类类序列i.i.d.", "issue": "原作用类bigram", "fix": "恢复P(c_t|c_{t-1})"},
+      {"file": "volumes/part2/ch08_语言模型的进化：从n-gram到神经网络.md", "line": 789, "severity": "high", "category": "fact", "claim": "BP过长惩罚exp", "issue": "c>r时BP=1", "fix": "改正BP分支说明"}
+    ],
+    "ch09-12": [
+      {"file": "volumes/part3/ch09_深度信念网络与预训练的革命.md", "line": 207, "severity": "high", "category": "latex", "claim": "\\log-likelihood裸写", "issue": "非数学模式", "fix": "改为log-likelihood或$\\log$-likelihood"},
+      {"file": "volumes/part3/ch09_深度信念网络与预训练的革命.md", "line": 374, "severity": "high", "category": "contradiction", "claim": "CD-k目标≈D_KL(p_k||p_∞)称等价", "issue": "与差分KL不等价", "fix": "删除错误等价句"},
+      {"file": "volumes/part3/ch09_深度信念网络与预训练的革命.md", "line": 546, "severity": "high", "category": "structure", "claim": "wakesleep连写", "issue": "不一致", "fix": "wake-sleep"},
+      {"file": "volumes/part3/ch09_深度信念网络与预训练的革命.md", "line": 700, "severity": "high", "category": "structure", "claim": "如第6章所述", "issue": "应为第6节", "fix": "第6节"},
+      {"file": "volumes/part3/ch10_GPU计算与大数据.md", "line": 61, "severity": "high", "category": "fact", "claim": "Fermi FP64为FP32的1/8", "issue": "专业线约1/2", "fix": "区分专业卡与消费级"},
+      {"file": "volumes/part3/ch10_GPU计算与大数据.md", "line": 101, "severity": "high", "category": "structure", "claim": "第2.2节节", "issue": "重复节", "fix": "删一个节"},
+      {"file": "volumes/part3/ch10_GPU计算与大数据.md", "line": 195, "severity": "high", "category": "latex", "claim": "ReLU f(x)=\\max裸写", "issue": "非数学模式", "fix": "$f(x)=\\max(0,x)$"},
+      {"file": "volumes/part3/ch10_GPU计算与大数据.md", "line": 452, "severity": "high", "category": "fact", "claim": "AWS P2用P100", "issue": "P2是K80", "fix": "改为Tesla K80"},
+      {"file": "volumes/part3/ch11_深度学习的关键理论突破.md", "line": 761, "severity": "high", "category": "fact", "claim": "2010年AlexNet", "issue": "2012", "fix": "2012年"},
+      {"file": "volumes/part3/ch11_深度学习的关键理论突破.md", "line": 379, "severity": "high", "category": "contradiction", "claim": "tanh却用0.25界", "issue": "0.25是sigmoid", "fix": "明确对象为sigmoid或改正tanh界"},
+      {"file": "volumes/part3/ch12_计算机视觉的演进.md", "line": 51, "severity": "high", "category": "latex", "claim": "分母花括号未闭合", "issue": "display math坏", "fix": "闭合括号"},
+      {"file": "volumes/part3/ch12_计算机视觉的演进.md", "line": 457, "severity": "high", "category": "fact", "claim": "D^{-1/2}WD^{-1/2}取第二小特征值", "issue": "应第二大；第二小对应拉普拉斯", "fix": "二选一统一表述"}
+    ],
+    "ch13-16": [
+      {"file": "volumes/part4/ch13_ImageNet与AlexNet.md", "line": 462, "severity": "high", "category": "fact", "claim": "AlexNet数据并行", "issue": "是模型/特征图并行", "fix": "改为模型并行并修正相关段落"},
+      {"file": "volumes/part4/ch13_ImageNet与AlexNet.md", "line": 611, "severity": "high", "category": "contradiction", "claim": "亚军VGG 26.1%", "issue": "亚军ISI；表内也矛盾", "fix": "亚军ISI约26.1%"},
+      {"file": "volumes/part4/ch13_ImageNet与AlexNet.md", "line": 618, "severity": "high", "category": "fact", "claim": "表13-3 R-CNN特征标2012传统方法", "issue": "R-CNN 2014", "fix": "删除R-CNN标签"},
+      {"file": "volumes/part4/ch13_ImageNet与AlexNet.md", "line": 451, "severity": "high", "category": "fact", "claim": "GTX580 DP 1.3 TFLOPS", "issue": "DP约1/8 SP", "fix": "SP~1.6 DP~0.2"},
+      {"file": "volumes/part4/ch14_CNN架构的黄金时代.md", "line": 77, "severity": "high", "category": "contradiction", "claim": "VGG RF 114 vs 212", "issue": "自相矛盾", "fix": "统一为约212"},
+      {"file": "volumes/part4/ch14_CNN架构的黄金时代.md", "line": 889, "severity": "high", "category": "structure", "claim": "第11节在第10节前", "issue": "编号倒置", "fix": "对调编号"},
+      {"file": "volumes/part4/ch14_CNN架构的黄金时代.md", "line": 728, "severity": "high", "category": "contradiction", "claim": "MobileNet 43M FLOPs", "issue": "应为~0.57G", "fix": "与表一致"},
+      {"file": "volumes/part4/ch15_Seq2Seq与Transformer.md", "line": 862, "severity": "high", "category": "incomplete", "claim": "第7.5节空", "issue": "内容在后文", "fix": "移入或删空标题"},
+      {"file": "volumes/part4/ch15_Seq2Seq与Transformer.md", "line": 120, "severity": "high", "category": "fact", "claim": "Sutskever2014用标签平滑", "issue": "2014未用", "fix": "删除该断言"},
+      {"file": "volumes/part4/ch16_生成模型的演进.md", "line": 620, "severity": "high", "category": "fact", "claim": "|t-1|是Wasserstein", "issue": "是TV", "fix": "改为全变差"},
+      {"file": "volumes/part4/ch16_生成模型的演进.md", "line": 828, "severity": "high", "category": "fact", "claim": "CIFAR-10表BigGAN IS166", "issue": "ImageNet数字", "fix": "拆表或改标数据集"}
+    ],
+    "ch17-20": [
+      {"file": "volumes/part5/ch17_预训练语言模型.md", "line": 309, "severity": "high", "category": "fact", "claim": "GPT-3词表204800", "issue": "约50257", "fix": "约50,257"},
+      {"file": "volumes/part5/ch17_预训练语言模型.md", "line": 341, "severity": "high", "category": "fact", "claim": "2020年9月ChatGPT前身", "issue": "API 2020；ChatGPT 2022-11", "fix": "区分API与ChatGPT"},
+      {"file": "volumes/part5/ch17_预训练语言模型.md", "line": 452, "severity": "high", "category": "citation", "claim": "ERNIE Zhang et al 2019", "issue": "百度是Sun 2019；Zhang是清华", "fix": "仅保留Sun et al 2019"},
+      {"file": "volumes/part5/ch17_预训练语言模型.md", "line": 614, "severity": "high", "category": "structure", "claim": "见第八章", "issue": "应为第8节", "fix": "见本章第8节"},
+      {"file": "volumes/part5/ch18_视觉Transformer与扩散模型.md", "line": 204, "severity": "high", "category": "fact", "claim": "DeiT-B参数为ResNet50的1/3", "issue": "实际约3倍", "fix": "改为约3倍或对比DeiT-S"},
+      {"file": "volumes/part5/ch18_视觉Transformer与扩散模型.md", "line": 416, "severity": "high", "category": "fact", "claim": "Improved DDPM三维softmax方差", "issue": "是log-space插值", "fix": "按Nichol改写"},
+      {"file": "volumes/part5/ch18_视觉Transformer与扩散模型.md", "line": 508, "severity": "high", "category": "fact", "claim": "Laudau理论", "issue": "拼写/理论错误", "fix": "Langevin/Fokker-Planck"},
+      {"file": "volumes/part5/ch18_视觉Transformer与扩散模型.md", "line": 536, "severity": "high", "category": "incomplete", "claim": "式6-43", "issue": "悬空编号", "fix": "改为指代上文公式"},
+      {"file": "volumes/part5/ch19_深度学习的理论难题.md", "line": 410, "severity": "high", "category": "contradiction", "claim": "表示坍塌第2节", "issue": "在第5节", "fix": "改为第5节"},
+      {"file": "volumes/part5/ch20_强化学习的复兴.md", "line": 238, "severity": "high", "category": "structure", "claim": "### 第4.x.x节", "issue": "应为####", "fix": "四级标题"},
+      {"file": "volumes/part5/ch20_强化学习的复兴.md", "line": 222, "severity": "high", "category": "incomplete", "claim": "规划Dreamer粘连", "issue": "缺句号", "fix": "加句号"},
+      {"file": "volumes/part5/ch20_强化学习的复兴.md", "line": 775, "severity": "high", "category": "fact", "claim": "Mandlekar 2021 ANYmal Parkour", "issue": "应为Hoeller等2023", "fix": "改作者年份"}
+    ]
+  }
+}

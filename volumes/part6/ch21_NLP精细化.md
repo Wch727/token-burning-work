@@ -24,28 +24,27 @@ $$
 
 **核心思想。** Linformer（Wang et al., 2020）的出发点是：实际应用中，注意力矩阵$A = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)$通常具有低秩结构。更精确地说，键矩阵$K \in \mathbb{R}^{n \times d_k}$和值矩阵$V \in \mathbb{R}^{n \times d_v}$可以分别通过秩为k的投影矩阵映射到低维子空间，且k远小于n（通常k = 256或128），同时保持输出质量接近全注意力。
 
-**数学推导。** 记$E_k \in \mathbb{R}^{d_k \times k}$和$E_v \in \mathbb{R}^{d_v \times k}$分别为键空间和值空间的投影矩阵。Linformer将原始的键值计算替换为：
+**数学推导。** Linformer 的关键是沿序列长度维度 $n$ 做低秩投影，而非沿特征维度。记投影矩阵 $E, F \in \mathbb{R}^{n \times k}$（$k \ll n$），键值矩阵 $K, V \in \mathbb{R}^{n \times d}$。先将键、值投影到长度为 $k$ 的序列：
 
 $$
-\tilde{K} = KE_k, \quad \tilde{V} = VE_v
+\bar{K} = E^\top K, \quad \bar{V} = F^\top V
 $$
 
-其中$\tilde{K} \in \mathbb{R}^{n \times k}, \tilde{V} \in \mathbb{R}^{n \times k}$。近似注意力输出为：
+其中 $\bar{K}, \bar{V} \in \mathbb{R}^{k \times d}$。近似注意力输出为：
 
 $$
-\tilde{O} = \text{softmax}\left(\frac{Q\tilde{K}^\top}{\sqrt{d_k}}\right)\tilde{V} = \text{softmax}\left(\frac{Q(KW_k)^\top}{\sqrt{d_k}}\right)VE_v
+\tilde{O} = \mathrm{softmax}\left(\frac{Q\bar{K}^\top}{\sqrt{d}}\right)\bar{V}
 $$
 
+此处 $Q\bar{K}^\top \in \mathbb{R}^{n \times k}$，不再构造完整的 $n \times n$ 注意力矩阵。
 
-这里 $W_k$ 是投影矩阵 $E_k \in \mathbb{R}^{d_k \times k}$，$W_v$ 是投影矩阵 $E_v \in \mathbb{R}^{d_v \times k}$。注意 $QK^\top \in \mathbb{R}^{n \times n}$ 的直接计算仍需要 $O(n^2d_k)$，因此 Linformer 将投影嵌入到计算图中：先计算 $\tilde{K} = KW_k \in \mathbb{R}^{n \times k}$ 和 $\tilde{V} = VE_v \in \mathbb{R}^{n \times k}$，再计算 $Q\tilde{K}^\top \in \mathbb{R}^{n \times k}$，最终将复杂度降至 $O(nkd_k)$。
+**方案一：核心采样（Core Sampling）。** 直接从 $n$ 个键/值位置中随机采样 $k$ 个，即 $E, F$ 为选择矩阵。这相当于对序列长度做下采样，时间复杂度为 $O(nkd)$。
 
-**方案一：核心采样（Core Sampling）。** 直接从n个键向量中随机采样k个，即$E_k$为一个从$\mathbb{R}^{d_k}$到$\mathbb{R}^k$的选择矩阵。这相当于对键向量进行下采样，时间复杂度降至$O(nkd_k)$。
+**方案二：可学习线性投影。** 将 $E, F$ 参数化为可训练矩阵，在预训练中与网络其余参数联合优化；也可采用固定卷积核将长度为 $n$ 的序列投影到长度为 $k$ 的序列。
 
-**方案二：卷积投影（Convolutional Projection）。** 使用固定卷积核将长度为n的序列投影到长度为k的序列。对于1D卷积，若核大小为p，步长为s，则$k = \lfloor (n-p)/s \rfloor + 1$。这利用了卷积的结构化特性，计算复杂度为$O(n \cdot d_k)$。
+**多头扩展。** 对于 $h$ 个注意力头，Linformer 可为每个头独立构造投影矩阵，也可采用"共享头投影"（head-wise shared projection）——所有头共享同一组 $E$ 和 $F$，在参数效率与表达力之间取得平衡。
 
-**多头扩展。** 对于h个注意力头，Linformer独立地为每个头构造投影矩阵。为避免每个头使用不同投影矩阵导致的表达力分散，Linformer进一步提出了"共享头投影"（head-wise shared projection）机制——所有头共享同一组$E_k$和$E_v$，从而在参数效率与表达力之间取得平衡。
-
-**复杂度分析。** 使用Linformer后，计算$\tilde{K} = KE_k$的复杂度为$O(n d_k k)$，计算$Q\tilde{K}^\top$的复杂度为$O(n^2 k)$，最终输出计算复杂度为$O(n k d_v)$。在不投影Q的标准实现中，整体复杂度约为$O(n^2 k)$——仅对键值矩阵做低秩投影不足以将复杂度降至近线性，因为Q与$\tilde{K}$的矩阵乘法仍受$O(n^2)$项支配。若同时对Q也做投影（即$\tilde{Q} = QW_q$），则$Q\tilde{K}^\top$的计算可降至$O(nk^2)$，整体复杂度达到$O(nk)$。在$n=4096, k=256, d=512$的设置下，标准Linformer将注意力计算加速约2-4倍；当Q/K/V均做投影时，加速比可达4-16倍，显存占用从$O(n^2)$降至$O(nk)$。
+**复杂度分析。** 计算 $\bar{K}=E^\top K$ 与 $\bar{V}=F^\top V$ 的代价为 $O(nkd)$；随后 $Q\bar{K}^\top$ 为 $O(nkd)$，$\mathrm{softmax}(\cdot)\bar{V}$ 亦为 $O(nkd)$。因此整体注意力复杂度为 $O(nkd)$，显存占用从 $O(n^2)$ 降至 $O(nk)$。在 $n=4096, k=256, d=512$ 的设置下，相对标准注意力可获得数倍加速。
 
 ### 第1.3节 Performer：随机特征核估计
 
@@ -325,7 +324,7 @@ $$
 
 ### 第2.3节 Graph-of-Thought：图状推理与思维组合
 
-**超越树结构的动机。** Tree-of-Thought虽然引入了搜索机制，但其树结构限制了思维之间的连接方式——每个思维只能有一个父节点。Long（2023）提出的Graph-of-Thought（GoT）进一步将推理结构推广为有向无环图（DAG）$G = (V, E)$，允许一个思维被多个父思维引用，也允许同一父思维产生多个独立的分支思维后再进行融合。
+**超越树结构的动机。** Tree-of-Thought虽然引入了搜索机制，但其树结构限制了思维之间的连接方式——每个思维只能有一个父节点。Besta et al.（2023）提出的Graph-of-Thought（GoT）进一步将推理结构推广为有向无环图（DAG）$G = (V, E)$，允许一个思维被多个父思维引用，也允许同一父思维产生多个独立的分支思维后再进行融合。需要区分的是，Long（2023）的工作主要讨论语言模型引导的树状推理框架，并非 Graph-of-Thought 本身。
 
 **图状推理的形式化。** GoT定义了以下操作，使语言模型能够对思维图进行变换：
 
@@ -362,41 +361,6 @@ $$
 这允许模型根据任务相关性动态地决定每个候选思维的权重，而非简单地取多数投票（如ToT）或平均。
 
 **与MCTS的关系。** GoT可以看作是对Monte Carlo Tree Search（MCTS）在语言推理领域的推广。在MCTS中，每个节点代表一个游戏状态，而GoT中每个节点代表一个思维状态。GoT的聚合操作类似于MCTS中的backpropagation，将叶节点的价值信息沿边反向传播到根节点。不同的是，GoT中的"状态"是结构化的文本（思维），而非离散的游戏棋盘。
-
-**GOTofThought与自动化推理。** Long（2023）进一步提出了GOTofThought——一种使用GoT进行自动化数学推理的框架。其核心算法为：
-
-```
-函数 GoT_Solve(problem):
-    G = 初始化图(problem)
-    queue = [根节点]
-    
-    while queue非空 and 未达到最大迭代次数:
-        v = queue.pop()
-        
-        if v是终态:
-            return 解(v)
-        
-        // 生成候选思维
-        candidates = GenerateCandidates(v)
-        
-        // 对候选进行评分
-        scores = [Score(c) for c in candidates]
-        
-        // 剪枝
-        pruned = [c for c, s in zip(candidates, scores) if s > τ]
-        
-        if len(pruned) == 0:
-            continue
-        
-        // 聚合
-        v_agg = Aggregate(pruned)
-        
-        // 将聚合思维加入图
-        AddNode(G, v_agg, parent=v)
-        queue.push(v_agg)
-    
-    return 无解
-```
 
 ### 第2.4节 推理能力的Scaling与涌现
 
@@ -508,7 +472,8 @@ The Stack的数据处理流程体现了开源社区对数据治理的关注：
 - 隐藏维度：6144
 - 注意力头数：48
 - 序列长度：8192 token（比标准代码模型更长）
-- 位置编码：Multi-Query Attention（MQA）——所有注意力头共享同一组键值投影，显著降低了推理时的显存占用
+- 位置编码：可学习的绝对位置嵌入（learned absolute positional embeddings），最大位置 8192
+- 注意力结构：Multi-Query Attention（MQA）——所有注意力头共享同一组键值投影，显著降低了推理时的显存占用
 - 词汇表：49,152 token的BPE词汇表，针对多种编程语言联合训练
 
 训练使用900GB数据（包括The Stack的86%和约400GB的精选自然语言数据），在256张A100 GPU（80GB）上训练约24天。
@@ -596,7 +561,7 @@ $$
 
 **改进方向。** XLM-R（Conneau et al., 2019/2020）针对mBERT的局限性进行了系统改进：
 1. 使用更大的模型（RoBERTa-large，355M参数）
-2. 使用CulturaX数据集的扩展版本——覆盖100种语言、7.5TB文本
+2. 使用CC-100语料——覆盖约100种语言、约2.5TB文本
 3. 使用SentencePiece而非WordPiece进行tokenization
 4. 移除下一句预测（NSP）任务，仅使用MLM目标
 5. 更大的批次（8192）和更长的训练步数
@@ -622,10 +587,10 @@ $$
 
 **模型规模系列。** mT5提供了从60M到13B参数的完整规模系列：
 - mT5-small：约300M参数，隐藏维度512，8层，8头
-- mT5-base：约580M参数，隐藏维度1024，12层，16头
-- mT5-large：约770M参数，隐藏维度1024，24层，32头
-- mT5-xl：约1.2B参数，隐藏维度1024，24层，32头
-- mT5-xxl：约11B参数，隐藏维度1024，24层，32头
+- mT5-base：约580M参数，隐藏维度768，12层，12头
+- mT5-large：约1.2B参数，隐藏维度1024，24层，16头
+- mT5-xl：约3.7B参数，隐藏维度2048，24层，32头
+- mT5-xxl：约13B参数，隐藏维度4096，24层，64头
 
 所有变体共享相同的Sparse Attention模式（仅对局部窗口和全局token计算注意力），将自注意力的复杂度从$O(n^2)$降至$O(n\sqrt{n})$。
 
@@ -660,7 +625,7 @@ $$
   
   这种排列方式使训练速度提升了约15%，可能是因为FFN和Attention的并行计算更好地利用了GPU的Tensor Core。
 
-**多语言训练数据。** PaLM的训练数据集称为"PaLM数据集"，包含715G高文本，涵盖英语（78%）、多语言代码（22%）以及涵盖法语、西班牙语、德语、日语、中文等语言的自然文本。具体组成：
+**多语言训练数据。** PaLM 约在 780B tokens 的混合语料上训练，涵盖英语（约 78%）、代码与多语言自然文本（法语、西班牙语、德语、日语、中文等）。具体组成：
 - 社交媒体对话：55%
 - 过滤后的网页：27%
 - 书籍：13%
