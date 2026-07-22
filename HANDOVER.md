@@ -57,10 +57,11 @@
 |------|------|------|------|
 | Round 1 | 6 组并行通读 24 章 | ~69 条高置信（事实/结构/LaTeX/矛盾） | 已修 → `b30e564` |
 | Round 2 | 3 组复审 | ~23 条残留硬伤（图灵九类/JOHNNIAC、Cover、AlexNet 裁剪、Seq2Seq 优化器、DistilBERT/Chinchilla 等） | 已修 → `0f00970` |
-| Round 3 | 3 组终审抽检 | ch09–16 与 ch17–24 共 ~10 条（ResNet-1001、词表、GT200 年、DQN Nature、mT5/PaLM、VideoMAE、Chinchilla 措辞等） | 已修 → `2e24f1b` |
+| Round 3 | 3 组终审抽检 | ~15 条零星硬伤（ResNet-1001、词表、GT200、DQN Nature、mT5/PaLM、VideoMAE、Samuel/Pearl 等） | 已修 → `2e24f1b`/`95130d8` |
+| Round 4 | 3 组终审抽检 | ~15 条（DL 时间线、Good Regulator、IBM 701 功耗、Krizhevsky 履历、ResNet 2015、GTX580 3GB、LAPGAN 2015、RoBERTa/ALBERT/C4/Codex/FAVOR+ 等） | 已修 → 本轮 commit |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：第 3 轮后仅剩抽检级零星问题；脚本审查无结构/格式告警。ch01–08 第 3 轮抽检若再返回条目，可继续补修。
+**停止准则**：第 4 轮后仍有抽检级条目但均可直接改完；脚本审查无结构/格式告警。再开一轮边际收益已很低。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -120,6 +121,8 @@
 
 **近期相关 commit（本机）**：
 ```
+(round-4) fix: remaining high-confidence hard errors
+95130d8 fix: round-3 ch01/ch03 residual timeline facts + update HANDOVER
 2e24f1b fix: round-3 spot-check — residual timeline and architecture facts
 0f00970 fix: round-2 re-review — remaining high-confidence factual errors
 b30e564 fix: round-1 agent review — factual, structural, latex fixes across 24 chapters
