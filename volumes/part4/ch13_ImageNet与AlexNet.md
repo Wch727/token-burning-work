@@ -58,7 +58,7 @@ Geoffrey E. Hinton，1947年出生于英国 Wimbledon。他的曾祖父是著名
 
 Alex Krizhevsky，1985年出生于乌克兰，在加拿大长大。他在多伦多大学获得数学和计算机科学学士学位后，加入了Hinton的实验室攻读硕士和博士。他是Hinton实验室中最出色的博士生之一，以其卓越的编程能力和系统设计能力著称。在AlexNet之前，Krizhevsky已经实现了一个名为**cuda-convnet**的GPU加速卷积神经网络框架，用CUDA编写，能够在NVIDIA GPU上进行高效的卷积运算。这个框架是AlexNet能够成功训练的关键基础设施——没有它，在合理时间内训练一个如此大规模的深度网络几乎是不可能的。
 
-Krizhevsky的性格低调而专注。他不太擅长在学术会议上做华丽的演讲，但他的代码几乎无可挑剔。在AlexNet取得成功后，他并没有选择进入学术界，而是于2017年加入了Facebook AI Research（FAIR），继续从事深度学习框架的研究工作。
+Krizhevsky的性格低调而专注。他不太擅长在学术会议上做华丽的演讲，但他的代码几乎无可挑剔。AlexNet 之后，他与 Sutskever 等创办 DNN Research 并被 Google 收购，在 Google 工作至约 2017 年离开；其后一度加入 Dessa 等创业公司，**并非** 2017 年加入 FAIR。
 
 ### 第3.3节 Ilya Sutskever：从理论到实践的桥梁
 
@@ -442,22 +442,22 @@ $$
 
 ### 第5.1节 硬件背景：NVIDIA GTX 580
 
-NVIDIA GTX 580于2010年11月发布，采用Fermi架构，是当时消费级市场的旗舰显卡。CUDA（Compute Unified Device Architecture）是NVIDIA于2007年推出的并行计算平台和编程模型。在AlexNet时代，CUDA已经发展到了较为成熟的版本，为Krizhevsky实现cuda-convnet提供了完整的编程基础设施。CUDA的层次化执行模型是理解AlexNet GPU实现的关键：线程是最小执行单元，每个线程执行相同的CUDA内核但处理不同数据；线程块是一组线程的集合，块内线程可通过共享内存进行高速数据交换，最大尺寸为1024个线程；线程网格由多个线程块组成，定义了整个CUDA内核的并发执行范围；流式多处理器是GPU的核心计算单元，GTX 580包含16个SM，每个SM包含32个CUDA核心，总共512个CUDA核心。CUDA的内存层次结构对AlexNet的性能至关重要：寄存器位于SM内部，延迟约1 cycle；共享内存位于SM内部，延迟约1-10 cycles，容量48KB；L1缓存位于SM内部，延迟约20-30 cycles；L2缓存位于GPU级别，延迟约200-400 cycles，容量768KB；全局内存即GDDR5显存，延迟约400-800 cycles，容量1.5GB，存储模型参数和输入输出特征图。Krizhevsky在cuda-convnet中手动实现了所有卷积、池化和激活函数的内核，针对GTX 580的Fermi架构进行了深度优化。现代cuDNN库虽然提供了自动优化的卷积内核，但AlexNet的自定义实现通过针对性的手工优化仍然达到了足够的性能。其关键规格如下：
+NVIDIA GTX 580于2010年11月发布，采用Fermi架构，是当时消费级市场的旗舰显卡。CUDA（Compute Unified Device Architecture）是NVIDIA于2007年推出的并行计算平台和编程模型。在AlexNet时代，CUDA已经发展到了较为成熟的版本，为Krizhevsky实现cuda-convnet提供了完整的编程基础设施。CUDA的层次化执行模型是理解AlexNet GPU实现的关键：线程是最小执行单元，每个线程执行相同的CUDA内核但处理不同数据；线程块是一组线程的集合，块内线程可通过共享内存进行高速数据交换，最大尺寸为1024个线程；线程网格由多个线程块组成，定义了整个CUDA内核的并发执行范围；流式多处理器是GPU的核心计算单元，GTX 580包含16个SM，每个SM包含32个CUDA核心，总共512个CUDA核心。CUDA的内存层次结构对AlexNet的性能至关重要：寄存器位于SM内部，延迟约1 cycle；共享内存位于SM内部，延迟约1-10 cycles，容量48KB；L1缓存位于SM内部，延迟约20-30 cycles；L2缓存位于GPU级别，延迟约200-400 cycles，容量768KB；全局内存即GDDR5显存，延迟约400-800 cycles，AlexNet所用 GTX 580 为每卡约 **3GB**（论文配置），存储模型参数和输入输出特征图。Krizhevsky在cuda-convnet中手动实现了所有卷积、池化和激活函数的内核，针对GTX 580的Fermi架构进行了深度优化。现代cuDNN库虽然提供了自动优化的卷积内核，但AlexNet的自定义实现通过针对性的手工优化仍然达到了足够的性能。其关键规格如下：
 
 - **CUDA核心数量**：512个
 - **核心频率**：782 MHz
-- **显存**：1.5 GB GDDR5（per GPU），384-bit总线宽度
-- **显存带宽**：192.4 GB/s（per GPU）
+- **显存**：AlexNet 论文写明两块 GTX 580 **3GB**（每卡约 3GB GDDR5；非 1.5GB 型号）
+- **显存带宽**：约 192 GB/s（per GPU，3GB 型号量级）
 - **峰值单精度（FP32）性能**：约 1.5–1.6 TFLOPS
 - **峰值双精度（FP64）性能**：约 0.19–0.20 TFLOPS（约为单精度的 1/8；Fermi 消费级卡的双精度被硬件限速）
 - **TDP**：244瓦
 
-AlexNet使用了**两块**GTX 580，这意味着：
-- **总显存**：3 GB（每块1.5 GB）
+AlexNet使用了**两块**GTX 580 3GB，这意味着：
+- **总显存**：约 **6 GB**（每卡 3GB，与论文一致）
 - **总CUDA核心**：1024个
-- **总内存带宽**：384.8 GB/s
+- **总内存带宽**：约 384 GB/s 量级
 
-3 GB的总显存在今天看来微不足道，但在2012年已经是极为可观的资源。正是显存限制决定了AlexNet必须采用**模型/特征图并行**（model / feature-map parallelism）而非“每卡一份完整模型副本”的数据并行——单个GTX 580的1.5 GB显存无法容纳整个网络的参数与中间激活。训练估算与实际运行均以**单精度（FP32）**为主，双精度峰值（约0.2 TFLOPS）并不用于训练吞吐估算。
+即便两卡合计约 6GB，单卡激活与参数仍紧张，因此采用**模型/特征图并行**（按通道切分、交叉连接），而非“每卡一份完整模型副本”的数据并行。训练估算与实际运行均以**单精度（FP32）**为主，双精度峰值（约 0.2 TFLOPS）并不用于训练吞吐估算。
 
 ### 第5.2节 模型并行与特征图并行策略
 
@@ -490,7 +490,7 @@ AlexNet的训练配置如下：
 - 批量大小 128 下本卡通道子集的中间激活
 - 本卡参数对应的优化器状态（动量项，见下文）
 
-对于AlexNet的约6000万参数，若完整参数以32位浮点存放约需 240 MB 量级；按通道切分后单卡卷积参数与激活显著下降，这才使 1.5 GB 显存可运行。Conv1 全量输出 $55 \times 55 \times 96 \approx 291K$ 个元素，在 batch=128 时约 $291K \times 128 \times 4 \text{ bytes} \approx 146 \text{ MB}$；切到单卡 48 通道后约为其一半，再叠加后续层与动量缓冲，两卡拆分成为必要工程选择。
+对于AlexNet的约6000万参数，若完整参数以32位浮点存放约需 240 MB 量级；按通道切分后单卡卷积参数与激活显著下降，这才使每卡约 **3GB** 显存可运行。Conv1 全量输出 $55 \times 55 \times 96 \approx 291K$ 个元素，在 batch=128 时约 $291K \times 128 \times 4 \text{ bytes} \approx 146 \text{ MB}$；切到单卡 48 通道后约为其一半，再叠加后续层与动量缓冲，两卡拆分成为必要工程选择。
 
 ### 第5.3节 随机梯度下降与动量优化
 
@@ -514,7 +514,7 @@ $$
 
 #### 第5.3.1节 学习率调度
 
-AlexNet使用固定的学习率 $\eta = 0.01$，没有使用学习率衰减。Sutskever在实验中观察到，对于这个特定的网络和数据集，固定学习率配合动量优化已经能够获得良好的收敛效果。当验证集误差在若干轮内不再改善时，手动将学习率除以10。
+AlexNet **使用阶梯学习率衰减**：初始 $\eta=0.01$，当验证误差停滞时手动除以 10，训练中衰减多次（终约 $10^{-5}$）。不宜写成“没有使用学习率衰减”。
 
 #### 第5.3.2节 权重衰减
 
@@ -870,7 +870,7 @@ AlexNet的胜利对DeepMind产生了深远影响。Hassabis在多次采访中提
 AlexNet之后的几年里，全球科技巨头几乎同时转向深度学习：
 
 - **Facebook**：2013年成立Facebook AI Research（FAIR），由Yann LeCun领导；收购Wit.ai（语音识别）和Ozlo（对话AI）。
-- **Microsoft**：2014年在ImageNet竞赛中使用残差网络（ResNet）将Top-5错误率降至3.57%，低于人类水平（约5%）；发布CNTK深度学习框架。
+- **Microsoft**：2015 年 MSRA/ResNet 团队在 ILSVRC-2015 上将 Top-5 错误率降至约 3.57%（**集成**结果；2014 年冠军为 GoogLeNet，尚无 ResNet）；并发布 CNTK 等深度学习框架。
 - **Baidu**：2014年成立深度学习研究院（IDL），由Adam Coates和余凯领导；发布PaddlePaddle框架。
 - **Amazon**：2014年开始大规模投资Alexa的深度学习能力；发布MXNet框架。
 - **Apple**：2015年开始在Siri、照片识别等产品中大规模部署深度学习；发布Core ML框架。特别值得一提的是，Apple在iOS 10中引入了深度学习驱动的照片识别功能，能够在用户的相册中自动识别和分类人物、地点和物体，这一功能完全在设备端运行，保护了用户隐私。
@@ -1283,7 +1283,7 @@ AlexNet的成功彻底改变了三位主角的人生轨迹：
 
 **Geoffrey Hinton**：2013年离开多伦多大学加入Google，担任Google Brain团队的兼职负责人。2018年因在深度学习领域的贡献获得图灵奖。2023年宣布离开Google。
 
-**Alex Krizhevsky**：AlexNet后在多伦多大学继续研究，期间他继续优化cuda-convnet框架并探索更深层次的网络架构。2017年加入Facebook AI Research（FAIR），继续从事深度学习框架和分布式训练的研究。2018年离开学术界，此后的公开信息较少，但据传他参与了一些深度学习的商业项目。
+**Alex Krizhevsky**：AlexNet 后参与 DNN Research 并被 Google 收购，在 Google 从事深度学习研究至约 2017 年离开；其后去向包括创业公司 Dessa 等，不宜写成 2017 年加入 FAIR。
 
 **Ilya Sutskever**：2015年离开多伦多大学，参与创办OpenAI并担任首席科学家。2023年11月参与OpenAI董事会关于CEO Sam Altman的解职事件，随后重新加入OpenAI，2024年5月离开OpenAI创办自己的公司Safe Superintelligence Inc.
 

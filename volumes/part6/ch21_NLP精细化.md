@@ -70,37 +70,13 @@ $$
 
 从而将$O(n^2)$的注意力矩阵计算转化为$O(nm)$的特征映射内积计算，其中m为随机特征的维度（通常m = 256或512）。
 
-**FAVOR+的数学推导。** 直接应用随机Fourier特征（Rahimi & Recht, 2007）虽然可以得到softmax核的无偏估计，但估计方差较大。Performer提出了FAVOR+（Fast Attention Via positive Orthogonal Random features）方法，利用以下恒等式：
+**FAVOR+ 的数学要点。** 经典随机 Fourier 特征（RFF，Rahimi & Recht, 2007）用 $\cos/\sin$ 映射近似平移不变核，但用于 softmax 注意力时可能出现负特征、方差偏大。Performer 的 **FAVOR+**（Fast Attention Via positive Orthogonal Random features）采用**正正交随机特征**，以保证非负近似并降低方差。典型形式可写为
 
 $$
-\exp(x^\top y) = \lim_{m \to \infty} \frac{1}{m} \sum_{r=1}^m \left[ f_r(x) f_r(y) + g_r(x) h_r(y) \right]
+\phi(x)\ \propto\ \exp\!\left(-\frac{\|x\|^2}{2}\right)\exp(Wx)
 $$
 
-其中$f_r, g_r, h_r$为精心设计的随机函数。具体地，FAVOR+使用如下构造：
-
-对于每个随机特征维度$r = 1, \ldots, m$，独立采样：
-- $w_r \sim \mathcal{N}(0, I_{d_k})$（高斯随机向量）
-- $b_r \sim \text{Uniform}[0, 2\pi]$（均匀随机偏置）
-
-定义特征映射$\phi: \mathbb{R}^{d_k} \to \mathbb{R}^{2m}$为：
-
-$$
-\phi(x) = \frac{1}{\sqrt{m}} \left[ \cos(w_1^\top x + b_1), \ldots, \cos(w_m^\top x + b_m), \sin(w_1^\top x + b_1), \ldots, \sin(w_m^\top x + b_m) \right]^\top
-$$
-
-则有：
-
-$$
-\mathbb{E}[\phi(x)^\top \phi(y)] = \exp(x^\top y)
-$$
-
-这是标准的随机Fourier特征（RFF）结果。然而，RFF的方差在高维空间中仍然较大。FAVOR+通过引入正交随机矩阵来降低方差。具体地，使用Hadamard矩阵$H \in \mathbb{R}^{m \times m}$（满足$HH^\top = mI$）对随机特征进行正交化变换：
-
-$$
-\tilde{\phi}(x) = \frac{1}{\sqrt{m}} H \phi(x)
-$$
-
-正交化后，不同特征之间的相关性降低，估计方差显著减小。
+（再对随机投影方向做正交化），其中 $W$ 的行取自高斯再正交化。这与 $\phi(x)=[\cos(w^\top x+b),\sin(\cdot)]$ 的 RFF 不同：FAVOR+ 强调 **正特征 + 正交化**，从而更稳定地近似 softmax 核并支持线性复杂度注意力。
 
 **softmax注意力的分解。** 为了处理softmax的归一化分母，Performer将softmax分解为两个核函数的差：
 
@@ -380,7 +356,7 @@ $$
 
 ### 第3.1节 OpenAI Codex：代码生成的GPT-3微调
 
-**模型架构与训练。** Codex（Chen et al., 2021）是OpenAI在GPT-3（175B参数）基础上进行代码领域微调的产物。其架构继承了GPT-3的Transformer decoder结构，但训练数据和目标函数针对代码生成任务进行了优化。
+**模型架构与训练。** Codex（Chen et al., 2021）是在 GPT 系列模型上做代码领域微调的产物；公开报告的最大变体约 **12B**（如 Codex-12B），**并非** 175B GPT-3 的直接微调版。其架构为 Transformer decoder，训练数据与目标针对代码生成优化。
 
 训练数据来源于公开的GitHub代码仓库，经过严格的过滤和质量控制。过滤标准包括：
 - 使用基于启发式的恶意代码检测与过滤
