@@ -67,10 +67,11 @@
 | Round 10 | **6 组全量复审** 24 章 | ch17–24 返回 `[]`；ch05–16 仍有约 15 条 high（Rosenblatt Award、Schapire D2、Brown 聚类、Sigmoid 区间、MI50/CDNA、Samuel 中心格、MNIST SOTA 等） | 已修 → `7558a71` |
 | Round 11 | **6 组全量复审** 24 章 | ch17–20 返回 `[]`；其余约 20 条 high（Codex/GPT-J、GLUE/SuperGLUE 分数、ShuffleNet、BERT GLUE 9 项、BERT-Large TPU、定理编号、IBM 701 产量等） | 已修 → `dff9172` |
 | Round 12 | **6 组全量复审** 24 章 | 约 33 条 high（Entscheidungsproblem、DiagonalTM、DBN VC、AlexNet 2010/2012 混用、ViT 87.12%、CFG、GAIL、StarCoder 512、Omohundro 六驱动力等） | 已修 → `7a3ce4d` |
-| Round 13 | **6 组全量复审** 24 章 | 约 28 条 high（Fisher 渐近、MEMM 标签偏差、LeNet-5 层数、Viola–Jones 6061、VGG-19 参数、StyleGAN FID、RoBERTa 86.4、BCQ、ToT/YOLOv7/DeepLabv3 等）；ch01 组超时无新报 | 已修（本轮） |
+| Round 13 | **6 组全量复审** 24 章 | 约 28 条 high（Fisher 渐近、MEMM 标签偏差、LeNet-5 层数、Viola–Jones 6061、VGG-19 参数、StyleGAN FID、RoBERTa 86.4、BCQ、ToT/YOLOv7/DeepLabv3 等）；ch01 组超时无新报 | 已修 → `9f4f651` |
+| Round 14 | **6 组全量复审**（部分组完成） | ch01–04 / 05–08 / 09–12 / 21–24 已出结果并已修；**ch13–16 / ch17–20 结果未落地**（重读 agent 被中断） | **部分完成**（本 commit） |
 | 脚本 | review-r8 + review-r10 | 0 findings | 通过 |
 
-**停止准则**：R5 起恢复全量通读；R13 后脚本仍 0 findings。硬伤数量持续下降；可再开 R14 确认是否趋近 `[]`。
+**停止准则**：R5 起恢复全量通读；硬伤数量持续下降。R14 **未闭环**：需补跑 ch13–16、ch17–20 全量通读 → 修 → 再开 R15 确认是否趋近 `[]`。
 
 ### 2.4 事实核验（Agent 并行 + 原文对照）
 
@@ -126,15 +127,15 @@
 
 | # | 问题 | 说明 |
 |---|------|------|
-| 7 | 统一 commit | 已多轮 commit；本地 `main` 领先 `origin/main`（未 push） |
+| 7 | 统一 commit | 已多轮 commit；R14 部分修复待 push |
 
 **近期相关 commit（本机）**：
 ```
-（本轮）fix: R13 full re-read — high-confidence hard errors + HANDOVER
+（本轮）fix: R14 partial full re-read — ch01-12/21-24 hard errors + HANDOVER
+9f4f651 fix: R13 full re-read — high-confidence hard errors + HANDOVER
 7a3ce4d fix: R12 full re-read — high-confidence hard errors + HANDOVER
 dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
 7558a71 fix: R10 full re-read — high-confidence hard errors + HANDOVER
-662b25c fix: R9 full re-read — high-confidence hard errors across 24 chapters
 ```
 
 ---
@@ -217,15 +218,44 @@ dff9172 fix: R11 full re-read — high-confidence hard errors + HANDOVER
 
 ---
 
-## 八、后续建议
+## 八、后续建议 / 接手立刻做
 
-1. ~~优先处理结构问题~~ — 已完成
-2. ~~ch14 事实核验~~ — 已完成
-3. ~~全量 review-r8 + review-r10~~ — 已通过
-4. **通读** ch05 / ch14 / ch15，检查改写后的上下文
-5. 可选：统一 ch20/ch22 三级标题层级；为各章加 `[[TOC]]`
-6. push 到 GitHub（若尚未推送）
+### 8.1 R14 未完成（最高优先）
+
+1. **补跑全量通读**（非抽检）：
+   - `volumes/part4/ch13–ch16`（ImageNet/AlexNet、CNN 黄金时代、Seq2Seq/Transformer、生成模型）
+   - `volumes/part5/ch17–ch20`（预训练 LM、ViT/扩散、理论难题、RL 复兴）
+2. 只收 **高置信硬伤**（fact / latex / structure / contradiction / citation），风格意见丢弃。
+3. 修完后跑：`node scripts/review-r8.js` + `node scripts/review-r10.js`（须 0 findings）→ commit → `git push origin main`。
+4. 再开 **R15 六组全量复审**；若多组返回 `[]` 且仅剩非 action 意见，可停。
+
+### 8.2 R14 本 commit 已修摘要（约 22 条）
+
+| 章 | 修复要点 |
+|----|---------|
+| ch01 | Principia \*2.85 正确式；Selfridge=MIT Lincoln Lab；Solomonoff=TRG NY；Williams 管 1024bit≠32×36 字 |
+| ch03 | 人脸识别：Bledsoe + Helen Chan/Bisson，非 Herbert Browning |
+| ch04 | Lighthill A/B/C 按原文：A=Advanced Automation，B=Bridge/Building Robots，C=CNS |
+| ch06 | METECH → MITRE Alembic / MUC |
+| ch07 | 删伪 “Werbos 1986 Nature 通信”；加拿大双中心≠含 LeCun 地理三角；DBN MNIST 约 1.25% 非“超越所有” |
+| ch09 | 信念网：Pearl 系统化，非 “Hinton 1986 提出” |
+| ch10 | AlexNet 单模型 Top-5 **18.2%**（非 17.0%）；TPU v3 ≈**123 TFLOPS BF16** |
+| ch12 | 尺度空间：Witkin 1983 引入，Lindeberg 公理化发展 |
+| ch21 | SuperGLUE BERT≈69 / BERT++≈71.5；Copilot 上下文去掉“行=字符”量纲混写 |
+| ch22 | DeepLabv1 无 ASPP（v2 才有）；v3+ Cityscapes 约 77.21→78.21；ByteTrack **仍用 NMS** |
+| ch23 | SAN = **Spectral** Attention Network |
+| ch24 | Kleinberg ITCS **2017**/arXiv 2016；Reluplex 主验 ACAS Xu 非 MNIST CNN |
+
+### 8.3 其它（非阻塞）
+
+- 通读检查 ch05 / ch14 / ch15 改写连贯性
+- 可选：统一 ch20/ch22 三级标题；各章加 `[[TOC]]`
+
+### 8.4 工作流口令
+
+用户站立指令：**继续** = 全量 agent 通读 → 修 → 脚本 0 → commit/push → 再通读，直到 high 趋近 `[]`。  
+**禁止抽检**；不要设 finding 条数上限。
 
 ---
 
-*本文档由 Claude Code 维护。*
+*本文档由 Claude Code 维护。最近交接：2026-07-22（R14 部分完成，用户登机中断）。*

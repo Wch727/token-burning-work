@@ -261,7 +261,7 @@ $$P(Y = 1 \mid \hat{Y} = s, A = a) = P(Y = 1 \mid \hat{Y} = s, A = a') = P(Y = 1
 
 **Chouldechova（2017）定理**。假设（1）真实标签 $Y$ 与受保护属性 $A$ 不独立，即 $P(Y=1 \mid A=a) \neq P(Y=1 \mid A=a')$（底层的base rate差异）；（2）存在假阳性（$Y=0, \hat{Y}=1$）和真阳性（$Y=1, \hat{Y}=1$）。则满足均等赔率（EO）必然意味着不满足校准性，反之亦然。
 
-**Kleinberg等人（2018）定理**。假设（1）存在base rate差异；（2）决策者希望使用一个依赖于 $Y$ 的评分函数；（3）存在假阳性和假阴性。则满足校准性和满足"平衡的误差率"（balanced FPR and FNR across groups）之间存在根本性矛盾。
+**Kleinberg等人（arXiv 2016 / ITCS 2017）定理**。假设（1）存在base rate差异；（2）决策者希望使用一个依赖于 $Y$ 的评分函数；（3）存在假阳性和假阴性。则满足校准性和满足"平衡的误差率"（balanced FPR and FNR across groups）之间存在根本性矛盾。
 
 这些impossibility结果揭示了公平性并非一个纯粹的技术问题，而是一个涉及社会价值权衡的规范性（normative）问题。选择哪一个公平性指标，本质上是在不同的公平观念之间做出选择。例如，人口统计均等对应的是结果公平（fair outcomes）的观念，而校准性对应的是程序公平（fair procedures）的观念。在不同的应用场景中，社会对"公平"的定义本身就可能不同，不存在一个放之四海而皆准的"公平算法"。
 
@@ -516,7 +516,7 @@ $$a_l = \hat{a}_l + v_l, \quad \hat{a}_l \geq 0, \quad v_l \geq 0, \quad \hat{a}
 
 其中 $v_l$ 是松弛变量，$\hat{a}_l \cdot v_l = 0$ 这个双线性约束（bilinear constraint）编码了ReLU的特性：预激活 $a_l$ 和激活 $\hat{a}_l$ 中至少有一个为零（当 $a_l \leq 0$ 时 $\hat{a}_l = 0$；当 $a_l > 0$ 时 $\hat{a}_l = a_l$）。
 
-Reluplex使用分段单纯形法（piecewise simplex method）来高效处理这些约束。与通用SMT求解器不同，Reluplex利用神经网络的特殊结构（矩阵乘法的线性、ReLU的分段线性）来定制求解策略。Katz等人证明，Reluplex能够在合理时间内验证小型网络（如MNIST上的2-3层卷积网络）在 $L_\infty$ 扰动下的鲁棒性，精确地证明或反驳了"在扰动半径 $\epsilon$ 内，所有扰动下分类不变"的命题。
+Reluplex使用分段单纯形法（piecewise simplex method）来高效处理这些约束。与通用SMT求解器不同，Reluplex利用神经网络的特殊结构（矩阵乘法的线性、ReLU的分段线性）来定制求解策略。Katz等人（2017）主要在 **ACAS Xu** 等全连接网络上展示了可扩展验证；MNIST 上的 CNN 鲁棒性验证更多由后续工具（如 ReluVal、CROWN 等）推进，不宜把“MNIST 2–3 层卷积网络 $L_\infty$ 验证”直接记在 Reluplex 名下。
 
 **计算复杂性的根本限制**。Katz等人（2017）同时证明了一个令人警醒的impossibility结果：对于一般的ReLU网络，验证其在 $L_\infty$ 扰动下的鲁棒性是NP-complete的。这意味着不存在能够在多项式时间内解决所有实例的算法——对于大型网络，精确验证在最坏情况下需要指数时间。NP-completeness的证明通过将3-SAT问题归约到神经网络验证问题完成：给定任意一个3-SAT实例，可以构造一个ReLU网络和一个输入扰动，使得该输入在扰动下被错误分类当且仅当3-SAT实例是可满足的。由于3-SAT是NP-complete的，神经网络验证也是NP-complete的。
 
@@ -846,7 +846,7 @@ Jain, A., et al. (2023). Benchmarking machine learning models on fairness and ro
 
 Jia, J., et al. (2021). Certified robustness for deep neural networks via space folding. In ICLR 2022.
 
-Kleinberg, J., Mullainathan, S., & Raghavan, M. (2018). Inherent trade-offs in the fair determination of risk scores. In Innovations in Theoretical Computer Science.
+Kleinberg, J., Mullainathan, S., & Raghavan, M. (2017). Inherent trade-offs in the fair determination of risk scores. In Innovations in Theoretical Computer Science (ITCS); arXiv:1609.05807 (2016).
 
 Krueger, D., et al. (2020). Hidden incentives for auto-induced distributional shift. arXiv preprint arXiv:2009.00653.
 
