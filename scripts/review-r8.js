@@ -84,16 +84,17 @@ FILES.forEach((fp, idx) => {
       continue
     }
     if (t.startsWith('$$') && t.endsWith('$$') && t.length > 4) continue
-    if (t.startsWith('\\[') || t.startsWith('\\]')) continue
-    if (inDisplayBlock) continue
-    const beginM4 = t.match(/^\\begin\{(\w+)\*?\}/)
+    if (!inDisplayBlock && t === '\\[') { inDisplayBlock = true; continue }
+    if (inDisplayBlock && t === '\\]') { inDisplayBlock = false; continue }
     const endM4 = t.match(/^\\end\{(\w+)\*?\}/)
-    if (beginM4) {
-      if (displayEnvs.has(beginM4[1])) inDisplayBlock = true
-      continue
-    }
     if (endM4) {
       if (displayEnvs.has(endM4[1])) inDisplayBlock = false
+      continue
+    }
+    if (inDisplayBlock) continue
+    const beginM4 = t.match(/^\\begin\{(\w+)\*?\}/)
+    if (beginM4) {
+      if (displayEnvs.has(beginM4[1])) inDisplayBlock = true
       continue
     }
     const dollarCount = (lines[i].match(/\$/g) || []).length
