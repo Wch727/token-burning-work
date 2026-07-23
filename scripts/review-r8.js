@@ -113,6 +113,7 @@ FILES.forEach((fp, idx) => {
     const t = lines[i].trim()
     if (t.startsWith('```')) { inCode = !inCode; continue }
     if (t.startsWith('$$') && t.endsWith('$$') && t.length > 4) continue
+    if (t.startsWith('\\[') && t.endsWith('\\]') && t.length > 4) continue
     if (inCode) continue
     if (!inDisplay && (t === '$$' || t === '\\[')) { inDisplay = true; continue }
     if (inDisplay && (t === '$$' || t === '\\]')) { inDisplay = false; continue }

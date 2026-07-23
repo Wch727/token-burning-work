@@ -386,13 +386,13 @@ $$\bar{g}_t = \frac{1}{B}\sum_{i\in B_t}\mathrm{clip}(\nabla_\theta \ell_i, C),\
 - 若对裁剪梯度**求和**后添加噪声，则 $\tilde{g}_t = \sum\mathrm{clip} + \mathcal{N}(0, \sigma^2 C^2 I)$，此时 L2 敏感度为 $C$；
 - 若如上式**取平均**，则敏感度为 $C/B$，噪声应为 $\tilde{g}_t = \bar{g}_t + \mathcal{N}(0, \sigma^2 (C/B)^2 I)$。
 
-两种写法数学等价（只需重新定义 $\sigma$ 尺度），但**必须在同一约定内写一致**；当前正文混用了 $\bar{g}_t$（平均）与 $\mathcal{N}(0, \sigma^2 C^2 I)$（求和噪声尺度），易造成读者的理解冲突。
+两种写法数学等价（只需重新定义 $\sigma$ 尺度），但噪声尺度、学习率和敏感度必须采用同一约定，否则会造成参数标定的混乱。
 
 隐私损失跟踪。在 $T$ 轮训练后，使用moments accountant方法（Abadi等人，2016）或RDP accountant（Mironov，2017）来计算总隐私损失 $(\epsilon, \delta)$。对于采样率 $q = B/N$（$B$ 为批量大小，$N$ 为数据集大小）和噪声乘子 $\sigma$，经过 $T$ 轮后的Rényi隐私损失满足：
 
 高斯机制的 RDP 阶 $\alpha$ 满足 $\varepsilon(\alpha)=\alpha/(2\sigma^2)$（无子采样）；Poisson 子采样后常用近似为 $\varepsilon(\alpha)\approx T\,q^2\alpha/(2\sigma^2)$（Mironov / 子采样 RDP 界，需注明适用条件）。$\alpha(\alpha+1)$ 来自 moments accountant 的 log-MGF 界，不宜直接当作 RDP 主公式。
 
-这给出了隐私预算 $\epsilon$ 与训练轮数 $T$、噪声水平 $\sigma$ 和采样率 $q$ 之间的精确权衡。噪声越大、训练轮数越少，隐私保护越强——但模型精度也会随之下降，这就是DP带来的"隐私-效用权衡"（privacy-utility tradeoff）。
+这给出了隐私预算 $\epsilon$ 与训练轮数 $T$、噪声水平 $\sigma$ 和采样率 $q$ 之间的定性或近似关系（该关系在子采样RDP分析中使用了近似，而非精确等式）。噪声越大、训练轮数越少，隐私保护越强——但模型精度也会随之下降，这就是DP带来的"隐私-效用权衡"（privacy-utility tradeoff）。
 
 ### 第5.5节 梯度剪裁的理论分析
 
@@ -545,7 +545,7 @@ $$\underline{f}_{y}(x) > \max_{c \neq y} \overline{f}_{c}(x),$$
 
 其中 $\underline{f}$、$\overline{f}$ 是 IBP 传播得到的下界和上界。注意不要将不等号方向写反——正确类需"高于"而非"低于"其他类。
 
-Gowal等人（2018）证明了IBP的一个关键定理：如果使用足够紧的区间抽象（即，对每个神经元的输出计算精确的上界和下界），IBP可以给出任意精度的鲁棒性认证——随着抽象精度的提高，认证半径收敛到精确值。在实践中，Gowal等人使用了"CROWN"抽象（Zhang等人，2018），通过对每个ReLU单元使用单约束上界（single-constraint upper bound）来平衡精度和计算效率。
+IBP对固定网络给出的区间界通常较松，且这种松弛会随层数累积。Gowal等人（2018）的核心贡献并非证明IBP可以任意逼近精确验证结果，而是通过认证训练（certified training）——在训练目标中引入区间传播的松弛——使网络参数适应IBP的区间界，从而在若干数据集上获得可用的认证准确率。CROWN（Zhang等人，2018）及后续的CROWN-IBP等线性松弛方法属于相关但不同的技术路线，不应与Gowal等人的IBP训练混为一谈。
 
 IBP训练（IBP Training）的一个特别重要的应用是"用IBP训练出的模型可以被IBP本身认证"。Gowal等人（2018）发现，如果模型本身是用IBP的 loose 上界训练的（即，在训练时就将区间传播的上界纳入损失函数），那么训练出的模型在IBP认证下的鲁棒半径远大于用标准训练或PGD训练训练的模型。这一发现催生了"训练即认证"（train-to-certify）范式：不追求在PGD攻击下的经验鲁棒性，而是直接优化认证鲁棒性。这一范式的优势在于认证保证是数学确定性的——不需要担心存在未知的攻击向量绕过防御。
 
