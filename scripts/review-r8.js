@@ -69,6 +69,13 @@ FILES.forEach((fp, idx) => {
   })
 
   // 4. LaTeX: unmatched $ in inline math (exclude currency and multi-line display math)
+  const displayEnvs = new Set([
+    'equation', 'equation*',
+    'align', 'align*', 'aligned',
+    'gather', 'gather*',
+    'multline', 'multline*',
+    'split', 'cases',
+  ])
   let inDisplayBlock = false
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim()
@@ -79,7 +86,16 @@ FILES.forEach((fp, idx) => {
     if (t.startsWith('$$') && t.endsWith('$$') && t.length > 4) continue
     if (t.startsWith('\\[') || t.startsWith('\\]')) continue
     if (inDisplayBlock) continue
-    if (t.startsWith('\\begin{') || t.startsWith('\\end{')) continue
+    const beginM4 = t.match(/^\\begin\{(\w+)\*?\}/)
+    const endM4 = t.match(/^\\end\{(\w+)\*?\}/)
+    if (beginM4) {
+      if (displayEnvs.has(beginM4[1])) inDisplayBlock = true
+      continue
+    }
+    if (endM4) {
+      if (displayEnvs.has(endM4[1])) inDisplayBlock = false
+      continue
+    }
     const dollarCount = (lines[i].match(/\$/g) || []).length
     if (dollarCount % 2 !== 0 && dollarCount > 0) {
       // Exclude currency patterns like $7,500 or $2.40
@@ -100,7 +116,16 @@ FILES.forEach((fp, idx) => {
     if (inCode) continue
     if (!inDisplay && (t === '$$' || t === '\\[')) { inDisplay = true; continue }
     if (inDisplay && (t === '$$' || t === '\\]')) { inDisplay = false; continue }
-    if (t.startsWith('\\begin{') || t.startsWith('\\end{')) continue
+    const beginM = t.match(/^\\begin\{(\w+)\*?\}/)
+    const endM = t.match(/^\\end\{(\w+)\*?\}/)
+    if (beginM) {
+      if (displayEnvs.has(beginM[1])) inDisplay = true
+      continue
+    }
+    if (endM) {
+      if (displayEnvs.has(endM[1])) inDisplay = false
+      continue
+    }
     if (inDisplay) continue
     if (t.startsWith('|')) continue
     if (t.startsWith('图')) continue
