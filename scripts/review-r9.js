@@ -220,3 +220,6 @@ console.log(JSON.stringify({
   bySeverity: sevs,
   findings: findings.slice(0, 80)
 }, null, 2))
+
+const blockers = findings.some(f => f.severity === 'critical' || f.severity === 'high')
+if (blockers) process.exitCode = 1

@@ -149,11 +149,10 @@
 | 脚本 | 用途 | 用法 |
 |------|------|------|
 | `scripts/review-r8.js` | 结构审查：标题层级、重复节、LaTeX `$` 配对 | `node scripts/review-r8.js` |
-| `scripts/review-r10.js` | 内容审查：引用格式、LaTeX 反斜杠、英文术语、`$` 转义 | `node scripts/review-r10.js` |
+| `scripts/review-r9.js` | LaTeX 反斜杠完整性 | `node scripts/review-r9.js` |
+| `scripts/review-r10.js` | 内容格式审查：引用格式、反斜杠、英文术语 | `node scripts/review-r10.js` |
 | `scripts/fix-subsection-numbering.js` | 修复 ch05/ch15 小节编号（支持 `--dry`） | `node scripts/fix-subsection-numbering.js` |
-| `scripts/ai_history.js` | 原始生成脚本（已不再使用） | — |
-| `scripts/review-workflow.js` | 审查工作流编排 | — |
-| `scripts/fix-r*.js` | 各轮修复脚本（历史存档） | — |
+| `npm run review:all` | 依次运行 r8 → r9 → r10 | `npm run review:all` |
 
 **review-r10.js 已知跳过规则**（无需修复）：
 

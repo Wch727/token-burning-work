@@ -1,7 +1,7 @@
 const meta = {
   name: 'review-r10',
-  description: 'Second round agent review on all 24 chapters after HIGH fixes applied',
-  phases: [{ title: 'Review', detail: '6 parallel agents cover all 24 chapters' }]
+  description: 'Content format review: citation format, LaTeX backslash, English term checks, verification of previous fixes',
+  phases: [{ title: 'Review', detail: 'Regex-based review across all 24 chapters' }]
 }
 
 const fs = require('fs')
@@ -191,3 +191,6 @@ console.log(JSON.stringify({
   byChapter,
   findings: findings.slice(0, 100)
 }, null, 2))
+
+const blockers = findings.some(f => f.severity === 'critical' || f.severity === 'high')
+if (blockers) process.exitCode = 1

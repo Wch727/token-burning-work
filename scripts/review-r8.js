@@ -97,8 +97,8 @@ FILES.forEach((fp, idx) => {
     const t = lines[i].trim()
     if (t.startsWith('```')) { inCode = !inCode; continue }
     if (inCode) continue
-    if (t.startsWith('$$') || t.startsWith('\\[')) { inDisplay = true; continue }
-    if (t.startsWith('$$') || t.startsWith('\\]')) { inDisplay = false; continue }
+    if (!inDisplay && (t.startsWith('$$') || t.startsWith('\\['))) { inDisplay = true; continue }
+    if (inDisplay && (t.startsWith('$$') || t.startsWith('\\]'))) { inDisplay = false; continue }
     if (t.startsWith('\\begin{') || t.startsWith('\\end{')) continue
     if (inDisplay) continue
     if (t.startsWith('|')) continue
@@ -146,3 +146,6 @@ console.log(JSON.stringify({
   byChapter,
   findings: unique
 }, null, 2))
+
+const blockers = unique.some(f => f.severity === 'critical' || f.severity === 'high')
+if (blockers) process.exitCode = 1

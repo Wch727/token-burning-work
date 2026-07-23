@@ -60,7 +60,7 @@
 | ImageNet / AlexNet | 单模型 10-view 与集成、2010/2012 数字勿混；Top-1/Top-5 分开记 |
 | CNN 表（VGG/ResNet 等） | FLOPs 与 Mult-Adds 计数约定不同；注明论文来源 |
 | GAN / 扩散 / RL 公式 | 最大化 vs 最小化目标、目标网络 vs 在线网络、折扣占有是否归一 |
-| 隐私 DP-SQL | 必须 **逐样本** 梯度裁剪，不是对 batch 均值裁一次 |
+| 隐私 DP-SGD | 必须 **逐样本** 梯度裁剪，不是对 batch 均值裁一次 |
 | 硬件峰值 | TPU/GPU TFLOPS 依赖精度（FP16/BF16/FP8）与是否含稀疏；勿横比不同口径 |
 | 基准分数 | GLUE / SuperGLUE / MMLU / HumanEval 等写明模型与评测设定（shot 数等） |
 
