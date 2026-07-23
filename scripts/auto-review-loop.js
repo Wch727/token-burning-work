@@ -26,7 +26,7 @@ const CHAPTER_FILES = [
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
-const BASE = 'C:\\Users\\22974\\desktop\\数模\\token-burning-work'
+const BASE = path.dirname(__dirname)
 
 // Accumulate known-fixes across rounds
 let knownFixesList = [

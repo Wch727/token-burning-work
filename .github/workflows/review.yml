@@ -14,5 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run structural review
+      - name: Run structural review (r8)
         run: node scripts/review-r8.js
+      - name: Run LaTeX completeness (r9)
+        run: node scripts/review-r9.js
+      - name: Run content format review (r10)
+        run: node scripts/review-r10.js

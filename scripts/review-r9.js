@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const BASE = path.join(process.env.USERPROFILE || process.env.HOME, 'desktop', '数模', 'token-burning-work')
+const BASE = path.dirname(__dirname)
 
 function read(fp) { return fs.readFileSync(path.join(BASE, fp), 'utf8') }
 function lines(text) { return text.split('\n') }

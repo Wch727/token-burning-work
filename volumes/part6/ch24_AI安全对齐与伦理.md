@@ -381,9 +381,12 @@ $$\bar{g}_t = \frac{1}{B}\sum_{i\in B_t}\mathrm{clip}(\nabla_\theta \ell_i, C),\
 
 对 batch 均值做一次裁剪**不能**保证单样本敏感度 $\le C$；Abadi 等 DP-SGD 必须 per-example clip。
 
-步骤2：添加噪声。在裁剪平均后的梯度上添加Gaussian噪声：
+步骤2：添加噪声。在裁剪平均后的梯度上添加Gaussian噪声。**注意噪声标定需与平均/求和约定一致**：
 
-$$\tilde{g}_t = \bar{g}_t + \mathcal{N}(0, \sigma^2 C^2 I)$$
+- 若对裁剪梯度**求和**后添加噪声，则 $\tilde{g}_t = \sum\mathrm{clip} + \mathcal{N}(0, \sigma^2 C^2 I)$，此时 L2 敏感度为 $C$；
+- 若如上式**取平均**，则敏感度为 $C/B$，噪声应为 $\tilde{g}_t = \bar{g}_t + \mathcal{N}(0, \sigma^2 (C/B)^2 I)$。
+
+两种写法数学等价（只需重新定义 $\sigma$ 尺度），但**必须在同一约定内写一致**；当前正文混用了 $\bar{g}_t$（平均）与 $\mathcal{N}(0, \sigma^2 C^2 I)$（求和噪声尺度），易造成读者的理解冲突。<
 
 隐私损失跟踪。在 $T$ 轮训练后，使用moments accountant方法（Abadi等人，2016）或RDP accountant（Mironov，2017）来计算总隐私损失 $(\epsilon, \delta)$。对于采样率 $q = B/N$（$B$ 为批量大小，$N$ 为数据集大小）和噪声乘子 $\sigma$，经过 $T$ 轮后的Rényi隐私损失满足：
 
@@ -514,9 +517,9 @@ $$a_l = W_l a_{l-1} + b_l$$
 
 其中 W_l 是权重矩阵，b_l 是偏置向量，a_l 是第 l 层的预激活（pre-activation）。ReLU激活函数定义为 $\hat{a}_l = \max(0, a_l)$，这可以编码为三个线性约束：
 
-$$a_l = \hat{a}_l + v_l, \quad \hat{a}_l \geq 0, \quad v_l \geq 0, \quad \hat{a}_l \cdot v_l = 0$$
+$$a_l = \hat{a}_l - v_l, \quad \hat{a}_l \geq 0, \quad v_l \geq 0, \quad \hat{a}_l \cdot v_l = 0$$
 
-其中 $v_l$ 是松弛变量，$\hat{a}_l \cdot v_l = 0$ 这个双线性约束（bilinear constraint）编码了ReLU的特性：预激活 $a_l$ 和激活 $\hat{a}_l$ 中至少有一个为零（当 $a_l \leq 0$ 时 $\hat{a}_l = 0$；当 $a_l > 0$ 时 $\hat{a}_l = a_l$）。
+其中 $v_l$ 是松弛变量，$\hat{a}_l \cdot v_l = 0$ 这个双线性约束（bilinear constraint）编码了ReLU的特性：当 $a_l \leq 0$ 时 $\hat{a}_l = 0$、$v_l = -a_l$；当 $a_l > 0$ 时 $\hat{a}_l = a_l$、$v_l = 0$。
 
 Reluplex使用分段单纯形法（piecewise simplex method）来高效处理这些约束。与通用SMT求解器不同，Reluplex利用神经网络的特殊结构（矩阵乘法的线性、ReLU的分段线性）来定制求解策略。Katz等人（2017）主要在 **ACAS Xu** 等全连接网络上展示了可扩展验证；MNIST 上的 CNN 鲁棒性验证更多由后续工具（如 ReluVal、CROWN 等）推进，不宜把“MNIST 2–3 层卷积网络 $L_\infty$ 验证”直接记在 Reluplex 名下。
 
@@ -528,11 +531,19 @@ NP-completeness结果的实际含义是：对于足够大的网络（如超过10
 
 $$\max_{\delta \in B_p(x,\epsilon)} \ell_{ce}(f(x + \delta), y_{\text{true}})$$
 
-其中 $\mathcal{B}_p(x, \epsilon)$ 是扰动约束集合，$\ell_{\text{ce}}$ 是交叉熵损失或边界损失。如果该优化问题的最大值小于0（即，在扰动范围内的最坏情况下，真实类别的得分仍然高于其他类别），则网络在 $x$ 处被认证为鲁棒。
+其中 $\mathcal{B}_p(x, \epsilon)$ 是扰动约束集合，$\ell_{\text{ce}}$ 是交叉熵损失或边界损失。需要注意：交叉熵损失恒非负，**其最大值不可能小于 0**，因此以 $\max_{\delta} \ell_{\text{ce}} < 0$ 作为鲁棒认证条件在数学上不可能成立。正确的认证条件应使用类别 margin：
+
+$$\max_{\delta \in B_p(x,\epsilon)} \bigl( \max_{j \neq y} f_j(x+\delta) - f_y(x+\delta) \bigr) < 0,$$
+
+即最坏情况下正确类别的 logit 仍然严格高于其他所有类别。
 
 MILP方法的优势在于它可以处理更一般的激活函数（不仅限于ReLU），并且可以精确求解中等规模网络的最坏情况扰动。然而，MILP求解的时间随网络层数以指数增长——Tjeng等人报告，对于超过约10000个ReLU单元的网络，MILP求解器可能在数小时内无法完成验证。为了改善可扩展性，近年来的工作引入了分支定界（branch-and-bound）策略：不是一次性求解整个网络，而是逐层收紧边界，在早期剪枝掉不可能包含对抗样本的子树。
 
-**抽象解释与区间传播的深化**。在第6.3节中，我们简要介绍了区间bound propagation（IBP）。从形式化角度看，IBP属于"抽象解释"（abstract interpretation, Cousot和Cousot, 1977）这一更广泛的程序验证框架。抽象解释的核心思想是：不追踪程序（或神经网络）在每个具体输入上的精确行为，而是追踪程序在输入集合上的行为"抽象"——即，计算输出集合的上界和下界。如果对于所有输入 x' in B_p(x, epsilon)，f(x') 的第 c 类得分都小于第 c' 类的得分（对所有 c' \neq c），则网络在 x 处被认证为鲁棒。
+**抽象解释与区间传播的深化**。在第6.3节中，我们简要介绍了区间bound propagation（IBP）。从形式化角度看，IBP属于"抽象解释"（abstract interpretation, Cousot和Cousot, 1977）这一更广泛的程序验证框架。抽象解释的核心思想是：不追踪程序（或神经网络）在每个具体输入上的精确行为，而是追踪程序在输入集合上的行为"抽象"——即，计算输出集合的上界和下界。对于分类器 $f$，IBP 的认证条件是：对所有 $x' \in B_p(x, \epsilon)$，正确类别 $y$ 的得分下界仍**严格高于**其他所有类别的得分上界，即
+
+$$\underline{f}_{y}(x) > \max_{c \neq y} \overline{f}_{c}(x),$$
+
+其中 $\underline{f}$、$\overline{f}$ 是 IBP 传播得到的下界和上界。注意不要将不等号方向写反——正确类需"高于"而非"低于"其他类。
 
 Gowal等人（2018）证明了IBP的一个关键定理：如果使用足够紧的区间抽象（即，对每个神经元的输出计算精确的上界和下界），IBP可以给出任意精度的鲁棒性认证——随着抽象精度的提高，认证半径收敛到精确值。在实践中，Gowal等人使用了"CROWN"抽象（Zhang等人，2018），通过对每个ReLU单元使用单约束上界（single-constraint upper bound）来平衡精度和计算效率。
 
