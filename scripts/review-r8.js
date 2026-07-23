@@ -96,6 +96,8 @@ FILES.forEach((fp, idx) => {
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim()
     if (t.startsWith('```')) { inCode = !inCode; continue }
+    if (t.startsWith('$$') && t.endsWith('$$') && t.length > 4) continue
+    if (t.startsWith('\\[') || t.startsWith('\\]')) continue
     if (inCode) continue
     if (!inDisplay && (t.startsWith('$$') || t.startsWith('\\['))) { inDisplay = true; continue }
     if (inDisplay && (t.startsWith('$$') || t.startsWith('\\]'))) { inDisplay = false; continue }
